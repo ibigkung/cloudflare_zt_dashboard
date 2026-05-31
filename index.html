@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'"/>
+<title>Cloudflare Zero Trust — Complete Course</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+@media(min-width:768px){.md-hidden{display:none!important}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+*{box-sizing:border-box}
+:root{
+  --fs:16px;
+  --bg:#0B0F19;--surface:#111827;--card:#1E293B;--border:#1F2D40;
+  --cf:#F48120;--cfdk:#C86A10;--cflt:#FBA94C;
+  --accent:#38BDF8;--ok:#4ADE80;--danger:#F87171;
+  --muted:#94A3B8;--dim:#475569;--text:#E2E8F0;
+}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;font-size:var(--fs)}
+body.light-mode{--bg:#F0F4FA;--surface:#FFF;--card:#E8EFF8;--border:#CBD5E1;--text:#0F172A;--muted:#475569;--dim:#64748B}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}::-webkit-scrollbar-thumb:hover{background:var(--cf)}
+.grid-bg{background-color:var(--bg);background-image:linear-gradient(rgba(244,129,32,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(244,129,32,.04) 1px,transparent 1px);background-size:40px 40px}
+.slide-enter{animation:slideIn .35s cubic-bezier(.4,0,.2,1)}
+@keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+.pop-in{animation:popIn .5s cubic-bezier(.4,0,.2,1)}
+.dot-nav{width:8px;height:8px;border-radius:50%;transition:all .25s;cursor:pointer;border:1px solid var(--border);background:var(--border)}
+.dot-nav.active{background:var(--cf);border-color:var(--cf);width:24px;border-radius:4px;box-shadow:0 0 8px rgba(244,129,32,.5)}
+.dot-nav.done{background:rgba(244,129,32,.35);border-color:rgba(244,129,32,.35)}
+.code-block{background:#080C14;border:1px solid var(--border);border-radius:10px;padding:14px 48px 14px 16px;font-family:'Space Mono',monospace;font-size:calc(var(--fs)*.69);line-height:1.9;color:#94A3B8;overflow-x:auto;position:relative}
+body.light-mode .code-block{background:#1E293B}
+.code-block .kw{color:var(--cf);font-weight:700}.code-block .val{color:var(--accent)}.code-block .cm{color:#334155}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(244,129,32,.12);border:1px solid rgba(244,129,32,.2);border-radius:6px;color:var(--cf);font-size:10px;padding:3px 8px;cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.copy-btn:hover{background:rgba(244,129,32,.25)}
+.qopt{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:calc(var(--fs)*.8125);cursor:pointer;transition:all .18s;color:#CBD5E1;display:flex;align-items:center;gap:10px}
+body.light-mode .qopt{color:var(--muted)}
+.qopt:hover{background:var(--card);border-color:var(--cf);color:#FFF}
+.qopt::before{content:'○';font-size:12px;color:var(--dim);min-width:14px}
+.qopt.correct{background:rgba(74,222,128,.06);border-color:rgba(74,222,128,.4);color:var(--ok);cursor:default}
+.qopt.correct::before{content:'✓';color:var(--ok)}
+.qopt.wrong{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.3);color:var(--danger);cursor:default}
+.qopt.wrong::before{content:'✗';color:var(--danger)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:calc(var(--fs)*.625);padding:2px 9px;border-radius:5px;font-weight:500;letter-spacing:.03em}
+.pill-cf{background:rgba(244,129,32,.15);color:var(--cf);border:1px solid rgba(244,129,32,.2)}
+.pill-ok{background:rgba(74,222,128,.1);color:var(--ok);border:1px solid rgba(74,222,128,.2)}
+.pill-danger{background:rgba(248,113,113,.1);color:var(--danger);border:1px solid rgba(248,113,113,.2)}
+.pill-blue{background:rgba(56,189,248,.1);color:var(--accent);border:1px solid rgba(56,189,248,.2)}
+.section-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:18px 0}
+.lang-toggle{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:2px;gap:2px}
+.lang-btn{padding:5px 14px;border-radius:6px;font-size:calc(var(--fs)*.75);font-weight:500;cursor:pointer;transition:all .2s;color:var(--muted);border:none;background:transparent}
+.lang-btn.active{background:var(--cf);color:#fff;box-shadow:0 0 12px rgba(244,129,32,.4)}
+.search-input{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px 10px 40px;font-size:calc(var(--fs)*.8125);color:var(--text);outline:none;transition:all .2s;width:100%}
+.search-input:focus{border-color:var(--cf);box-shadow:0 0 0 3px rgba(244,129,32,.12)}
+.search-input::placeholder{color:var(--dim)}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;transition:all .18s;color:var(--muted);font-size:calc(var(--fs)*.8125);border:1px solid transparent}
+.sidebar-item:hover{background:var(--card);color:var(--text);border-color:var(--border)}
+.sidebar-item.active{background:rgba(244,129,32,.1);color:var(--cf);border-color:rgba(244,129,32,.2)}
+.bm-dot{width:6px;height:6px;border-radius:50%;background:var(--cf);flex-shrink:0}
+.note-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.nav-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:calc(var(--fs)*.8125);font-weight:500;cursor:pointer;transition:all .2s;border:none}
+.nav-btn-primary{background:var(--cf);color:#fff}
+.nav-btn-primary:hover{background:var(--cflt);box-shadow:0 0 20px rgba(244,129,32,.4);transform:translateY(-1px)}
+.nav-btn-secondary{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.nav-btn-secondary:hover{background:#243447;color:var(--text);border-color:var(--cf)}
+.nav-btn:disabled{opacity:.35;cursor:default;transform:none!important;box-shadow:none!important}
+.step-num{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Space Mono',monospace;background:rgba(244,129,32,.15);color:var(--cf);border:1px solid rgba(244,129,32,.25);flex-shrink:0}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:16px}
+.empty-icon{font-size:48px;opacity:.3}
+.ref-table{width:100%;border-collapse:collapse}
+.ref-table th{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:calc(var(--fs)*.6875);font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+.ref-table td{padding:10px 14px;border-bottom:1px solid rgba(31,45,64,.5);font-size:calc(var(--fs)*.75);color:var(--muted);vertical-align:top}
+.ref-table td:first-child{color:var(--text);font-weight:500;font-family:'Space Mono',monospace;font-size:calc(var(--fs)*.6875)}
+.ref-table tr:last-child td{border-bottom:none}
+.ref-table tr:hover td{background:rgba(31,45,64,.4)}
+.hover-card{transition:all .2s;border:1px solid var(--border)}
+.hover-card:hover{border-color:rgba(244,129,32,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:40}
+@media(max-width:768px){
+  .sidebar-overlay.open{display:block}
+  .sidebar-container{transform:translateX(-100%);transition:transform .3s;z-index:50}
+  .sidebar-container.open{transform:translateX(0)}
+}
+/* Toast */
+#toast-container{position:fixed;top:68px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#1E293B;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:calc(var(--fs)*.8125);color:var(--text);display:flex;align-items:center;gap:10px;min-width:220px;max-width:320px;animation:fadeUp .3s ease;pointer-events:auto;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.toast.hiding{animation:fadeOut .3s ease forwards}
+/* Modal */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-backdrop.open{display:flex}
+.modal-box{background:#111827;border:1px solid var(--border);border-radius:16px;padding:24px;width:90%;max-width:580px;max-height:80vh;overflow-y:auto;position:relative}
+body.light-mode .modal-box{background:#fff}
+.modal-close{position:absolute;top:14px;right:14px;background:var(--card);border:1px solid var(--border);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px;transition:all .18s}
+.modal-close:hover{color:var(--text);border-color:var(--cf)}
+/* TOC */
+.toc-chapter{font-size:calc(var(--fs)*.6875);font-weight:700;color:var(--cf);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px;padding-left:4px}
+.toc-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:all .18s;color:var(--muted);font-size:calc(var(--fs)*.8125);border:1px solid transparent;margin-bottom:3px}
+.toc-item:hover{background:var(--card);color:var(--text);border-color:var(--border)}
+.toc-item.cur{background:rgba(244,129,32,.1);color:var(--cf);border-color:rgba(244,129,32,.2)}
+.toc-check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px}
+.toc-check.done{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.4);color:var(--ok)}
+/* Notes */
+#notes-panel{position:fixed;bottom:80px;right:16px;width:300px;background:#111827;border:1px solid var(--border);border-radius:14px;padding:16px;z-index:90;display:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+body.light-mode #notes-panel{background:#fff}
+#notes-panel.open{display:block;animation:fadeUp .25s ease}
+.notes-textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:calc(var(--fs)*.8125);color:var(--text);font-family:'DM Sans',sans-serif;resize:vertical;min-height:100px;outline:none;transition:border-color .18s}
+.notes-textarea:focus{border-color:var(--cf)}
+/* KBD */
+.kbd-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:.5px solid var(--border);font-size:calc(var(--fs)*.8125)}
+.kbd-row:last-child{border-bottom:none}
+kbd{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:calc(var(--fs)*.75);font-family:'Space Mono',monospace;color:var(--text);white-space:nowrap}
+/* FAB */
+#fab-cluster{position:fixed;bottom:20px;right:16px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:80}
+.fab-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:#1E293B;color:var(--muted);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.fab-btn:hover{color:var(--cf);border-color:rgba(244,129,32,.4);transform:scale(1.08)}
+.fab-btn.active-note{color:var(--accent);border-color:rgba(56,189,248,.4)}
+.fab-btn.bookmarked{color:var(--cf);border-color:rgba(244,129,32,.4)}
+/* Misc */
+.read-time{font-size:calc(var(--fs)*.6875);color:var(--dim);display:flex;align-items:center;gap:5px}
+.fs-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-weight:600;font-size:12px;transition:all .18s}
+.fs-btn:hover{color:var(--cf);border-color:rgba(244,129,32,.3)}
+#scroll-top{position:fixed;bottom:72px;right:68px;width:36px;height:36px;background:var(--card);border:1px solid var(--border);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px;z-index:80;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#scroll-top:hover{color:var(--cf)}
+#scroll-top.visible{display:flex}
+#resume-banner{display:none;background:rgba(244,129,32,.1);border:1px solid rgba(244,129,32,.25);border-radius:10px;padding:10px 14px;margin-bottom:16px;align-items:center;gap:10px;font-size:calc(var(--fs)*.8125);animation:fadeUp .3s ease}
+#resume-banner.show{display:flex}
+.resume-accept{background:var(--cf);color:#fff;border:none;border-radius:7px;padding:5px 14px;font-size:calc(var(--fs)*.75);font-weight:500;cursor:pointer}
+.resume-accept:hover{background:var(--cflt)}
+.resume-dismiss{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;margin-left:auto}
+#cert-canvas{border-radius:10px;max-width:100%;display:block;margin:0 auto}
+.cert-name-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:calc(var(--fs)*.875);color:var(--text);outline:none;margin:12px 0;transition:border-color .18s}
+.cert-name-input:focus{border-color:var(--cf)}
+.ch-group-header{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;font-size:calc(var(--fs)*.6875);font-weight:700;color:var(--cf);text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border-radius:6px;transition:background .15s;margin-top:8px}
+.ch-group-header:hover{background:rgba(244,129,32,.06)}
+.ch-arrow{transition:transform .2s;font-size:10px}
+.ch-group-header.collapsed .ch-arrow{transform:rotate(-90deg)}
+.ch-group-items{overflow:hidden;transition:max-height .3s ease}
+@media print{
+  #app-header,#fab-cluster,#scroll-top,#toast-container,#notes-panel,
+  .modal-backdrop,#resume-banner,.dot-nav,#btn-prev,#btn-next,#page-info,
+  .sidebar-container,.sidebar-overlay,#dot-nav-wrap,#confetti-canvas{display:none!important}
+  #slide-container{min-height:auto!important}
+  .slide-page{page-break-after:always;padding:20px}
+  body{background:#fff!important;color:#000!important}
+  .code-block{background:#f5f5f5!important;color:#333!important;border:1px solid #ccc!important}
+}
+</style>
+</head>
+<body class="grid-bg" id="body-el">
+<div id="toast-container"></div>
+<!-- TOC Modal -->
+<div class="modal-backdrop" id="toc-modal">
+  <div class="modal-box">
+    <div class="modal-close" onclick="closeTOC()"><i class="fa fa-xmark"></i></div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px" id="toc-title">Table of Contents</div>
+    <div id="toc-body"></div>
+  </div>
+</div>
+<!-- Keyboard Help Modal -->
+<div class="modal-backdrop" id="kb-modal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-close" onclick="document.getElementById('kb-modal').classList.remove('open')"><i class="fa fa-xmark"></i></div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px" id="kb-title">Keyboard Shortcuts</div>
+    <div>
+      <div class="kbd-row"><kbd>← →</kbd><span style="color:var(--muted)">Navigate slides</span></div>
+      <div class="kbd-row"><kbd>T</kbd><span style="color:var(--muted)">Table of Contents</span></div>
+      <div class="kbd-row"><kbd>B</kbd><span style="color:var(--muted)">Toggle bookmark</span></div>
+      <div class="kbd-row"><kbd>N</kbd><span style="color:var(--muted)">Toggle notes panel</span></div>
+      <div class="kbd-row"><kbd>S</kbd><span style="color:var(--muted)">Focus search</span></div>
+      <div class="kbd-row"><kbd>P</kbd><span style="color:var(--muted)">Print / Save PDF</span></div>
+      <div class="kbd-row"><kbd>?</kbd><span style="color:var(--muted)">This help</span></div>
+      <div class="kbd-row"><kbd>Esc</kbd><span style="color:var(--muted)">Close modal / search</span></div>
+    </div>
+  </div>
+</div>
+<!-- Certificate Modal -->
+<div class="modal-backdrop" id="cert-modal">
+  <div class="modal-box" style="max-width:620px">
+    <div class="modal-close" onclick="document.getElementById('cert-modal').classList.remove('open')"><i class="fa fa-xmark"></i></div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px" id="cert-modal-title">Completion Certificate</div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:14px" id="cert-modal-sub">Enter your name to generate the certificate</div>
+    <input class="cert-name-input" id="cert-name" type="text" placeholder="Your name..."/>
+    <canvas id="cert-canvas" width="560" height="380"></canvas>
+    <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+      <button class="nav-btn nav-btn-secondary" onclick="generateCert()" id="cert-gen-btn">Generate</button>
+      <button class="nav-btn nav-btn-primary" onclick="downloadCert()" id="cert-dl-btn" style="display:none"><i class="fa fa-download" style="font-size:11px"></i> Download</button>
+    </div>
+  </div>
+</div>
+<canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:300;display:none"></canvas>
+<div id="app">
+  <header id="app-header" style="position:sticky;top:0;z-index:30;background:rgba(11,15,25,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)">
+    <div style="max-width:1200px;margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:12px">
+      <button id="menu-toggle" class="md-hidden" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px"><i class="fa fa-bars"></i></button>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div style="width:30px;height:30px;background:linear-gradient(135deg,#C86A10,#F48120);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px"><i class="fa fa-shield-halved" style="color:#fff"></i></div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);line-height:1">Cloudflare ZT</div>
+          <div style="font-size:10px;color:var(--dim);line-height:1;margin-top:2px" id="h-subtitle">Complete Course</div>
+        </div>
+      </div>
+      <div style="flex:1;max-width:340px;position:relative;margin-left:8px">
+        <i class="fa fa-search" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:12px;pointer-events:none"></i>
+        <input id="search-input" type="text" class="search-input" placeholder="ค้นหาเนื้อหา..." style="height:36px;font-size:12px"/>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <div class="fs-btn" onclick="changeFontSize(-1)">A-</div>
+        <div class="fs-btn" onclick="changeFontSize(1)">A+</div>
+      </div>
+      <button onclick="toggleTheme()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0"><i class="fa fa-sun" id="theme-icon"></i></button>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;flex-shrink:0">
+        <div style="width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="header-prog" style="height:100%;background:linear-gradient(90deg,#C86A10,#F48120);border-radius:2px;transition:width .4s;width:10%"></div></div>
+        <span id="header-prog-text" style="font-size:11px;font-weight:600;color:var(--cf);font-family:'Space Mono',monospace">1/10</span>
+      </div>
+      <div class="lang-toggle" style="flex-shrink:0">
+        <button class="lang-btn active" id="lang-th" onclick="setLang('th')">TH</button>
+        <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </header>
+  <div style="max-width:1200px;margin:0 auto;padding:0 16px;display:flex;gap:20px;min-height:calc(100vh - 112px)">
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar-container" style="width:248px;flex-shrink:0;padding:20px 0;position:sticky;top:76px;height:fit-content;max-height:calc(100vh - 80px);overflow-y:auto;background:var(--bg)">
+      <div style="padding:0 4px">
+        <div style="font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;padding:0 14px"><span id="nav-label">บทเรียน</span></div>
+        <nav id="sidebar-nav"></nav>
+        <div id="bookmarks-section" style="display:none;margin-top:14px">
+          <div style="font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding:0 14px" id="bm-label">Saved</div>
+          <nav id="bookmarks-nav"></nav>
+        </div>
+        <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div style="font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px" id="stats-label">สถิติ</div>
+          <div style="display:flex;justify-content:space-around">
+            <div style="text-align:center"><div id="stat-completed" style="font-size:20px;font-weight:700;color:var(--cf);font-family:'Space Mono',monospace">0</div><div style="font-size:10px;color:var(--dim);margin-top:2px" id="stat-completed-label">สำเร็จ</div></div>
+            <div style="width:1px;background:var(--border)"></div>
+            <div style="text-align:center"><div id="stat-quiz" style="font-size:20px;font-weight:700;color:var(--accent);font-family:'Space Mono',monospace">0</div><div style="font-size:10px;color:var(--dim);margin-top:2px" id="stat-quiz-label">ตอบถูก</div></div>
+            <div style="width:1px;background:var(--border)"></div>
+            <div style="text-align:center"><div id="stat-time" style="font-size:20px;font-weight:700;color:var(--ok);font-family:'Space Mono',monospace">0</div><div style="font-size:10px;color:var(--dim);margin-top:2px" id="stat-time-label">นาที</div></div>
+          </div>
+        </div>
+        <button onclick="exportNotes()" style="width:100%;margin-top:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px">
+          <i class="fa fa-file-export"></i><span id="export-notes-label">Export Notes</span>
+        </button>
+      </div>
+    </aside>
+    <main style="flex:1;min-width:0;padding:20px 0">
+      <div id="resume-banner">
+        <i class="fa fa-history" style="color:var(--cf);flex-shrink:0"></i>
+        <span id="resume-text" style="color:var(--text)"></span>
+        <button class="resume-accept" id="resume-yes" onclick="resumeSession()">Resume</button>
+        <button class="resume-dismiss" onclick="dismissResume()"><i class="fa fa-xmark"></i></button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <div style="width:3px;height:16px;background:linear-gradient(#C86A10,#F48120);border-radius:2px;flex-shrink:0"></div>
+        <span id="chapter-label" style="font-size:10px;font-weight:700;color:var(--cf);text-transform:uppercase;letter-spacing:.1em"></span>
+        <div style="height:1px;flex:1;background:linear-gradient(90deg,var(--border),transparent)"></div>
+        <span class="read-time"><i class="fa fa-clock" style="font-size:10px"></i><span id="read-time-text" style="margin-left:4px"></span></span>
+      </div>
+      <div id="slide-container" style="min-height:500px"></div>
+      <div id="notes-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:600;color:var(--text)" id="notes-title">Notes</div>
+          <button onclick="toggleNotes()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px"><i class="fa fa-xmark"></i></button>
+        </div>
+        <textarea class="notes-textarea" id="notes-textarea" placeholder="Type your notes here..." oninput="saveNote()"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+          <button onclick="clearNote()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:11px;color:var(--dim);cursor:pointer">Clear</button>
+        </div>
+      </div>
+      <div id="dot-nav-wrap" style="margin-top:28px">
+        <div id="dot-nav" style="display:flex;gap:6px;justify-content:center;margin-bottom:16px;flex-wrap:wrap"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px">
+          <button id="btn-prev" class="nav-btn nav-btn-secondary" onclick="go(-1)" disabled><i class="fa fa-arrow-left" style="font-size:11px"></i><span id="btn-prev-text">ก่อนหน้า</span></button>
+          <span id="page-info" style="font-size:11px;font-weight:600;color:var(--dim);font-family:'Space Mono',monospace"></span>
+          <button id="btn-next" class="nav-btn nav-btn-primary" onclick="go(1)"><span id="btn-next-text">ถัดไป</span><i class="fa fa-arrow-right" style="font-size:11px"></i></button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div id="search-overlay" style="display:none;position:fixed;top:56px;left:0;right:0;z-index:25;background:rgba(11,15,25,.98);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);max-height:70vh;overflow-y:auto">
+    <div style="max-width:700px;margin:0 auto;padding:16px"><div id="search-results-list"></div></div>
+  </div>
+  <div id="fab-cluster">
+    <div class="fab-btn" id="fab-bm" onclick="toggleBookmark()" title="Bookmark (B)"><i class="fa fa-bookmark"></i></div>
+    <div class="fab-btn" id="fab-note" onclick="toggleNotes()" title="Notes (N)"><i class="fa fa-pen-to-square"></i></div>
+    <div class="fab-btn" onclick="openTOC()" title="Table of Contents (T)"><i class="fa fa-list"></i></div>
+    <div class="fab-btn" onclick="document.getElementById('kb-modal').classList.add('open')" title="Shortcuts (?)"><i class="fa fa-keyboard"></i></div>
+    <div class="fab-btn" onclick="window.print()" title="Print (P)"><i class="fa fa-print"></i></div>
+  </div>
+  <div id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa fa-arrow-up"></i></div>
+  <footer style="border-top:1px solid var(--border);background:rgba(11,15,25,.95);padding:14px 16px;margin-top:auto">
+    <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font-size:11px;color:#334155;font-family:'Space Mono',monospace">Powered by <span style="color:var(--cf);font-weight:700">IBIGKUNG</span> | 2026</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="openCertModal()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:11px;color:var(--dim);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fa fa-certificate" style="color:var(--cf)"></i><span id="cert-footer-label">Certificate</span></button>
+        <button onclick="document.getElementById('kb-modal').classList.add('open')" style="background:none;border:none;font-size:11px;color:var(--dim);cursor:pointer;display:flex;align-items:center;gap:5px"><i class="fa fa-keyboard"></i><span id="kb-footer-label">Shortcuts</span></button>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ── Safe DOM helpers (XSS prevention) ── */
+function safeText(el,v){if(el)el.textContent=String(v==null?'':v)}
+function validateInt(v,d){const n=parseInt(v);return Number.isFinite(n)?n:d}
+function validateBool(v,d){return v==='true'?true:v==='false'?false:d}
+function validateSet(v,d){try{const a=JSON.parse(v);return Array.isArray(a)?new Set(a.filter(x=>typeof x==='number')):d}catch{return d}}
+function validateObj(v,d){try{const o=JSON.parse(v);return o&&typeof o==='object'&&!Array.isArray(o)?o:d}catch{return d}}
+
+/* ── Translation dictionaries ── */
+const T={
+  th:{
+    subtitle:'คอร์สฉบับสมบูรณ์',navLabel:'บทเรียน',statsLabel:'สถิติ',
+    statCompleted:'สำเร็จ',statQuiz:'ตอบถูก',statTime:'นาที',
+    searchPH:'ค้นหาเนื้อหา...',searchEmpty:'ไม่พบผลลัพธ์สำหรับ',searchHint:'ลองค้นหาด้วยคำอื่น',
+    btnPrev:'ก่อนหน้า',btnNext:'ถัดไป',btnFinish:'สำเร็จแล้ว!',searchResults:'ผลการค้นหา',
+    tocTitle:'สารบัญ',kbTitle:'คีย์ลัด',bmLabel:'บันทึกไว้',exportNotes:'Export Notes',
+    certLabel:'ใบรับรอง',kbFooter:'คีย์ลัด',resumeText:'กลับมาต่อจากสไลด์ ',resumeYes:'ไปเลย',
+    notesTitle:'บันทึก — สไลด์ ',readMin:'นาที',
+    certTitle:'ใบรับรองการเรียน',certSub:'ป้อนชื่อเพื่อสร้างใบรับรอง',certGen:'สร้าง',certDl:'ดาวน์โหลด',
+    retakeQuiz:'ทำแบบทดสอบใหม่',getCert:'รับใบรับรอง',
+    slides:[
+      {chapter:'บทที่ 1 — แนวคิด Zero Trust',title:'Zero Trust คืออะไร?',sub:'และทำไมต้องเปลี่ยนจาก VPN แบบเดิม'},
+      {chapter:'บทที่ 1 — แนวคิด Zero Trust',title:'Cloudflare Zero Trust Platform',sub:'ครอบคลุม product อะไรบ้าง'},
+      {chapter:'บทที่ 2 — Cloudflare Access',title:'Access ทำงานอย่างไร?',sub:'กระบวนการตรวจสอบก่อนให้เข้าแอป'},
+      {chapter:'บทที่ 3 — Cloudflare Tunnel',title:'Cloudflare Tunnel (cloudflared)',sub:'เชื่อม server เข้า Cloudflare โดยไม่เปิด port'},
+      {chapter:'บทที่ 4 — Cloudflare Gateway',title:'Cloudflare Gateway (SWG)',sub:'กรอง traffic ขาออกสู่อินเทอร์เน็ต'},
+      {chapter:'บทที่ 5 — Device Posture',title:'Device Posture Check',sub:'ตรวจสุขภาพ device ก่อนให้เข้าระบบ'},
+      {chapter:'บทที่ 6 — WARP Client',title:'WARP Client',sub:'Agent บน device ของผู้ใช้'},
+      {chapter:'บทที่ 7 — การ Deploy จริง',title:'ขั้นตอน Deploy + สถานการณ์องค์กรไทย',sub:'จาก 0 ถึง production'},
+      {chapter:'สรุป — Quick Reference',title:'Cloudflare ZT — ตารางอ้างอิงเร็ว',sub:'เปรียบเทียบทุก product'},
+      {chapter:'ทบทวน — Quiz',title:'ทดสอบความเข้าใจ',sub:'15 ข้อ ครอบคลุมทุกบท'},
+    ],
+    sidebar:[
+      {icon:'fa-lightbulb',label:'Zero Trust คืออะไร?'},
+      {icon:'fa-layer-group',label:'Platform Overview'},
+      {icon:'fa-key',label:'Cloudflare Access'},
+      {icon:'fa-network-wired',label:'Cloudflare Tunnel'},
+      {icon:'fa-filter',label:'Gateway (SWG)'},
+      {icon:'fa-laptop-medical',label:'Device Posture'},
+      {icon:'fa-mobile-screen',label:'WARP Client'},
+      {icon:'fa-rocket',label:'Deploy จริง'},
+      {icon:'fa-table-list',label:'Quick Reference'},
+      {icon:'fa-circle-question',label:'Quiz'},
+    ],
+    chapterGroups:[
+      {label:'บทที่ 1 — Zero Trust',slides:[0,1]},
+      {label:'บทที่ 2-7 — Products',slides:[2,3,4,5,6,7]},
+      {label:'สรุป & Quiz',slides:[8,9]},
+    ],
+  },
+  en:{
+    subtitle:'Complete Course',navLabel:'Lessons',statsLabel:'Statistics',
+    statCompleted:'Done',statQuiz:'Correct',statTime:'Minutes',
+    searchPH:'Search content...',searchEmpty:'No results for',searchHint:'Try a different keyword',
+    btnPrev:'Previous',btnNext:'Next',btnFinish:'All Done!',searchResults:'Search Results',
+    tocTitle:'Table of Contents',kbTitle:'Keyboard Shortcuts',bmLabel:'Saved',exportNotes:'Export Notes',
+    certLabel:'Certificate',kbFooter:'Shortcuts',resumeText:'Resume from slide ',resumeYes:'Resume',
+    notesTitle:'Notes — Slide ',readMin:'min read',
+    certTitle:'Completion Certificate',certSub:'Enter your name to generate',certGen:'Generate',certDl:'Download',
+    retakeQuiz:'Retake Quiz',getCert:'Get Certificate',
+    slides:[
+      {chapter:'Chapter 1 — Zero Trust Concept',title:'What is Zero Trust?',sub:'And why move away from traditional VPN'},
+      {chapter:'Chapter 1 — Zero Trust Concept',title:'Cloudflare Zero Trust Platform',sub:'What products are included'},
+      {chapter:'Chapter 2 — Cloudflare Access',title:'How does Access work?',sub:'Verification flow before allowing app entry'},
+      {chapter:'Chapter 3 — Cloudflare Tunnel',title:'Cloudflare Tunnel (cloudflared)',sub:'Connect server without opening ports'},
+      {chapter:'Chapter 4 — Cloudflare Gateway',title:'Cloudflare Gateway (SWG)',sub:'Filter outbound internet traffic'},
+      {chapter:'Chapter 5 — Device Posture',title:'Device Posture Check',sub:'Check device health before granting access'},
+      {chapter:'Chapter 6 — WARP Client',title:'WARP Client',sub:'Agent installed on user devices'},
+      {chapter:'Chapter 7 — Real Deployment',title:'Deployment Steps + Thai Org Scenarios',sub:'From 0 to production'},
+      {chapter:'Summary — Quick Reference',title:'Cloudflare ZT — Quick Reference Table',sub:'Compare all products and use cases'},
+      {chapter:'Review — Quiz',title:'Knowledge Check',sub:'15 questions covering all chapters'},
+    ],
+    sidebar:[
+      {icon:'fa-lightbulb',label:'What is Zero Trust?'},
+      {icon:'fa-layer-group',label:'Platform Overview'},
+      {icon:'fa-key',label:'Cloudflare Access'},
+      {icon:'fa-network-wired',label:'Cloudflare Tunnel'},
+      {icon:'fa-filter',label:'Gateway (SWG)'},
+      {icon:'fa-laptop-medical',label:'Device Posture'},
+      {icon:'fa-mobile-screen',label:'WARP Client'},
+      {icon:'fa-rocket',label:'Real Deployment'},
+      {icon:'fa-table-list',label:'Quick Reference'},
+      {icon:'fa-circle-question',label:'Quiz'},
+    ],
+    chapterGroups:[
+      {label:'Chapter 1 — Zero Trust',slides:[0,1]},
+      {label:'Chapters 2-7 — Products',slides:[2,3,4,5,6,7]},
+      {label:'Summary & Quiz',slides:[8,9]},
+    ],
+  }
+};
+
+/* ── Slide HTML helpers ── */
+const KW=t=>`<span class="kw">${t}</span>`;
+const VAL=t=>`<span class="val">${t}</span>`;
+const CM=t=>`<span class="cm">${t}</span>`;
+function hl(html){return`<div style="background:rgba(244,129,32,.07);border-left:3px solid var(--cf);padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:18px;font-size:calc(var(--fs)*.8125);color:var(--muted);line-height:1.7">${html}</div>`}
+function card(icon,title,desc,pillClass,pillTxt){return`<div class="hover-card" style="background:var(--surface);border-radius:12px;padding:16px"><div style="font-size:20px;margin-bottom:8px">${icon}</div><div style="font-size:calc(var(--fs)*.8125);font-weight:600;color:var(--text);margin-bottom:4px">${title}</div><div style="font-size:calc(var(--fs)*.6875);color:var(--muted);line-height:1.6">${desc}</div>${pillClass?`<div style="margin-top:8px"><span class="pill ${pillClass}">${pillTxt}</span></div>`:''}</div>`}
+function exCard(label,title,desc,code,isOk){return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px"><span class="pill pill-cf" style="margin-bottom:10px;display:inline-flex">${label}</span><div style="font-size:calc(var(--fs)*.8125);font-weight:600;color:var(--text);margin-bottom:8px">${title}</div>${desc?`<div style="font-size:calc(var(--fs)*.75);color:var(--muted);line-height:1.7;margin-bottom:10px">${desc}</div>`:''}<div class="code-block"><button class="copy-btn" onclick="copyCode(this)"><i class="fa fa-copy"></i> Copy</button>${code}</div></div>`}
+function codeBlock(code){return`<div class="code-block"><button class="copy-btn" onclick="copyCode(this)"><i class="fa fa-copy"></i> Copy</button>${code}</div>`}
+function step(n,title,desc){return`<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px"><div class="step-num">${n}</div><div><div style="font-size:calc(var(--fs)*.8125);font-weight:600;color:var(--text);margin-bottom:3px">${title}</div><div style="font-size:calc(var(--fs)*.75);color:var(--muted);line-height:1.6">${desc}</div></div></div>`}
+function grid2(...items){return`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">${items.join('')}</div>`}
+function grid3(...items){return`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">${items.join('')}</div>`}
+function sHead(t){return`<div style="font-size:calc(var(--fs)*.75);font-weight:600;color:var(--text);margin-bottom:14px">${t}</div>`}
+function div_(){return`<div class="section-divider"></div>`}
+
+/* ── Slide content builders ── */
+function s0_th(){
+  return hl('<strong style="color:var(--text)">หลักการ:</strong> "Never Trust, Always Verify" — อย่าเชื่อใครโดยอัตโนมัติ แม้อยู่ใน network เดียวกัน')+
+  grid2(
+    card('🏰','VPN แบบเดิม','เชื่อทุกคนใน network — ถูก hack lateral move ได้ทั้ง network','pill-danger','⚠ เสี่ยง'),
+    card('🔐','Zero Trust','ตรวจสอบทุก request — ใคร? อุปกรณ์อะไร? จากที่ไหน? ก่อนให้เข้าแต่ละแอป','pill-ok','✓ ปลอดภัย')
+  )+
+  grid3(
+    card('🪪','Identity-first','ยืนยันตัวตน + MFA ก่อนเสมอ ไม่ขึ้นกับ network','',''),
+    card('🎯','Least privilege','เข้าแค่แอปที่ต้องใช้ ไม่ใช่ทั้ง network','',''),
+    card('🔒','Assume breach','สมมติว่าถูก hack แล้ว จำกัด lateral movement','','')
+  )+div_()+sHead('3 สถานการณ์จริง')+
+  exCard('ตัวอย่างที่ 1','WFH เข้าระบบ HR','VPN เดิม: เห็นทุกระบบ<br>Zero Trust: login ผ่าน Okta+MFA → เข้าได้เฉพาะ HR app',
+    `${KW('Rule:')} Allow<br>  email domain = ${VAL('@company.com')}<br>  ${KW('AND')} auth = ${VAL('Okta MFA')}<br>  ${KW('AND')} app = ${VAL('hr.company.co.th')}`,true)+
+  exCard('ตัวอย่างที่ 2','Contractor ชั่วคราว','VPN เดิม: ซับซ้อน ต้องจำลบ account<br>Zero Trust: policy มีวันหมดอายุอัตโนมัติ',
+    `${KW('Rule:')} Allow email ${KW('IN')} [${VAL('a@vendor.com')}]<br>  session = ${VAL('8h')}<br>  ${KW('Expires:')} ${VAL('2024-12-31')}`,true)+
+  exCard('ตัวอย่างที่ 3','Personal device ขอเข้า corp app','Posture check พบ disk ไม่ encrypt + OS เก่า',
+    `${KW('Posture check failed:')}<br>  disk_encryption = ${VAL('false')}<br>  os_version = ${VAL('macOS 11 (too old)')}<br>${CM('# → blocked แม้ password ถูกต้อง')}`,false)
+}
+function s0_en(){
+  return hl('<strong style="color:var(--text)">Principle:</strong> "Never Trust, Always Verify" — never automatically trust anyone, even inside the same network.')+
+  grid2(
+    card('🏰','Traditional VPN','Trusts everyone on the network — if hacked, lateral movement covers the entire network.','pill-danger','High Risk'),
+    card('🔐','Zero Trust','Verifies every request — Who? Which device? From where? Before access to each app.','pill-ok','Secure')
+  )+
+  grid3(
+    card('🪪','Identity-first','Always verify identity + MFA, independent of network location.','',''),
+    card('🎯','Least privilege','Access only the app needed, not the entire network.','',''),
+    card('🔒','Assume breach','Assume already compromised. Limit lateral movement.','','')
+  )+div_()+sHead('3 Real-World Scenarios')+
+  exCard('Example 1','WFH Employee Accessing HR','VPN: sees everything.<br>Zero Trust: login via Okta+MFA → HR app only.',
+    `${KW('Rule:')} Allow<br>  email domain = ${VAL('@company.com')}<br>  ${KW('AND')} auth = ${VAL('Okta MFA')}<br>  ${KW('AND')} app = ${VAL('hr.company.co.th')}`,true)+
+  exCard('Example 2','Temporary Contractor Access','VPN: complex, must remember to delete account.<br>Zero Trust: policy with auto-expiry.',
+    `${KW('Rule:')} Allow email ${KW('IN')} [${VAL('a@vendor.com')}]<br>  session = ${VAL('8h')}<br>  ${KW('Expires:')} ${VAL('2024-12-31')}`,true)+
+  exCard('Example 3','Personal Device Requesting Corp App','Posture check finds unencrypted disk + old OS.',
+    `${KW('Posture check failed:')}<br>  disk_encryption = ${VAL('false')}<br>  os_version = ${VAL('macOS 11 (too old)')}<br>${CM('# → blocked even with correct password')}`,false)
+}
+function s1_th(){
+  return hl('Cloudflare Zero Trust = กลุ่ม product บน <strong style="color:var(--text)">Global Network 300+ เมือง</strong> ผ่าน agent เดียว: <strong style="color:var(--cf)">WARP Client</strong>')+
+  grid2(
+    card('🔑','Cloudflare Access','ZTNA — ควบคุมว่าใครเข้าแอปไหนได้ รองรับ Web, SSH, RDP, TCP','pill-cf','แทน VPN'),
+    card('🌐','Cloudflare Gateway','SWG — กรอง DNS+HTTP traffic ขาออก บล็อก malware, phishing','pill-cf','แทน Proxy'),
+    card('📱','WARP Client','Agent ติดตั้งบน device ส่ง traffic ผ่าน Cloudflare ทั้งหมด','pill-cf','แทน VPN Client'),
+    card('🔒','Cloudflare Tunnel','cloudflared — เชื่อม server แบบ outbound ไม่เปิด port','pill-blue','Private Connector'),
+    card('🗄️','CASB','ตรวจ SaaS (Google Drive, M365) ว่ามี misconfiguration ไหม','pill-ok','SaaS Security'),
+    card('🛡️','DLP','Data Loss Prevention — สกัดข้อมูลสำคัญไม่ให้รั่ว เช่น บัตรเครดิต','pill-danger','Data Protection')
+  )
+}
+function s1_en(){
+  return hl('Cloudflare Zero Trust = a suite of products on <strong style="color:var(--text)">Global Network 300+ cities</strong> via single agent: <strong style="color:var(--cf)">WARP Client</strong>')+
+  grid2(
+    card('🔑','Cloudflare Access','ZTNA — controls who accesses which app. Supports Web, SSH, RDP, TCP','pill-cf','Replaces VPN'),
+    card('🌐','Cloudflare Gateway','SWG — filters DNS+HTTP outbound traffic, blocks malware and phishing','pill-cf','Replaces Proxy'),
+    card('📱','WARP Client','Device agent that routes all traffic through Cloudflare','pill-cf','Replaces VPN Client'),
+    card('🔒','Cloudflare Tunnel','cloudflared — outbound connection, no port opening required','pill-blue','Private Connector'),
+    card('🗄️','CASB','Audits SaaS apps (Google Drive, M365) for misconfigurations','pill-ok','SaaS Security'),
+    card('🛡️','DLP','Data Loss Prevention — prevents sensitive data leakage like credit card numbers','pill-danger','Data Protection')
+  )
+}
+function tunnelSVG(l1,l2,l3,l4,l5){
+  return`<div style="background:#080C14;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;overflow-x:auto"><svg width="100%" viewBox="0 0 680 100" style="min-width:400px"><defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#F48120" stroke-width="1.5"/></marker></defs><rect x="10" y="28" width="90" height="44" rx="8" fill="#1E293B" stroke="#334155" stroke-width="0.5"/><text x="55" y="55" text-anchor="middle" fill="#94A3B8" font-size="11" font-family="DM Sans,sans-serif">${l1}</text><line x1="100" y1="50" x2="158" y2="50" stroke="#F48120" stroke-width="1.5" marker-end="url(#ar)"/><rect x="158" y="15" width="160" height="70" rx="10" fill="#1E293B" stroke="#F48120" stroke-width="0.8"/><text x="238" y="46" text-anchor="middle" fill="#E2E8F0" font-size="12" font-family="DM Sans,sans-serif" font-weight="600">${l2}</text><text x="238" y="64" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="DM Sans,sans-serif">Access + Network</text><line x1="318" y1="50" x2="368" y2="50" stroke="#F48120" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/><text x="343" y="40" text-anchor="middle" fill="#F48120" font-size="10" font-family="DM Sans,sans-serif">${l3}</text><rect x="368" y="15" width="140" height="70" rx="10" fill="#1E293B" stroke="#334155" stroke-width="0.5"/><text x="438" y="46" text-anchor="middle" fill="#E2E8F0" font-size="11" font-family="Space Mono,monospace">cloudflared</text><text x="438" y="64" text-anchor="middle" fill="#94A3B8" font-size="10" font-family="DM Sans,sans-serif">${l4}</text><line x1="508" y1="50" x2="560" y2="50" stroke="#38BDF8" stroke-width="1.5" marker-end="url(#ar)"/><rect x="560" y="28" width="100" height="44" rx="8" fill="#1E293B" stroke="#334155" stroke-width="0.5"/><text x="610" y="55" text-anchor="middle" fill="#94A3B8" font-size="11" font-family="DM Sans,sans-serif">${l5}</text></svg></div>`
+}
+function s2(lang){
+  const t=lang==='th';
+  return hl(t?'ทุก request ถูก intercept ที่ <strong style="color:var(--text)">Cloudflare edge</strong> ก่อน — server ไม่รับ connection โดยตรงเลย':'Every request is intercepted at <strong style="color:var(--text)">Cloudflare edge</strong> first — the server never receives direct connections.')+
+  (t?step(1,'User เข้า app.company.com','Browser ถูก redirect ไปที่ Cloudflare Access ทันที')+step(2,'Identity Provider ตรวจสอบตัวตน','Login ผ่าน Okta, Azure AD, Google, GitHub + MFA')+step(3,'ตรวจ Access Policy','Email domain? Group? Country? Device compliant?')+step(4,'ผ่าน → ออก JWT + Forward ไปแอป','ส่ง request ผ่าน Tunnel พร้อม JWT header')
+  :step(1,'User accesses app.company.com','Browser immediately redirected to Cloudflare Access')+step(2,'Identity Provider verifies identity','Login via Okta, Azure AD, Google, GitHub + MFA')+step(3,'Access Policy check','Email domain? Group? Country? Device compliant?')+step(4,'Pass → Issue JWT + Forward to app','Routes request through Tunnel with JWT header'))+div_()+sHead(t?'3 ตัวอย่าง Policy จริง':'3 Real Policy Examples')+
+  exCard(t?'Internal Dashboard':'Internal Dashboard',t?'เฉพาะทีม Engineering ที่เปิด WARP':'Engineering team with WARP only',
+    codeBlock(`${KW('Rule:')} Allow  app: ${VAL('dashboard.company.com')}<br>  ${KW('Require')}: group = ${VAL('engineering')}<br>  ${KW('Require')}: WARP = ${VAL('enabled')}<br>  ${KW('Require')}: posture = ${VAL('compliant')}`),true)+
+  exCard(t?'SSH Production Server':'SSH Production Server',t?'SSH ผ่าน browser ไม่ต้องเปิด port 22':'SSH via browser without opening port 22',
+    codeBlock(`${KW('App type:')} SSH  hostname: ${VAL('prod.company.com')}<br>${KW('Tunnel:')} → ssh://10.0.1.50:22<br>${KW('Rule:')} Allow email = ${VAL('devops@company.com')}<br>  ${KW('AND')} country = ${VAL('TH')} ${KW('AND')} auth = ${VAL('hardwareKey')}`),true)+
+  exCard(t?'Vendor Portal':'Vendor Portal',t?'บล็อกทุก country ยกเว้น vendor + หมดอายุอัตโนมัติ':'Block all countries except vendor + auto-expiry',
+    codeBlock(`${KW('Rule 1:')} Block — country ${KW('NOT IN')} [${VAL('TH, SG, JP')}]<br>${KW('Rule 2:')} Allow email ${KW('IN')} [${VAL('a@vendor.com')}]<br>  session = ${VAL('8h')}  ${KW('Expires:')} ${VAL('2024-12-31')}`),true)
+}
+function s3(lang){
+  const t=lang==='th';
+  return hl(t?'cloudflared สร้าง <strong style="color:var(--text)">outbound connection</strong> จาก server ไปหา Cloudflare — ไม่มี inbound traffic เข้า firewall':'cloudflared creates an <strong style="color:var(--text)">outbound connection</strong> from server to Cloudflare — zero inbound traffic to your firewall.')+
+  tunnelSVG(t?'User':'User','Cloudflare',t?'Tunnel':'Tunnel',t?'on your server':'on your server',t?'App/SSH':'App/SSH')+
+  exCard(t?'Web App On-Prem':'On-Prem Web App',t?'เปิด internal app โดยไม่แตะ firewall':'Expose internal app without touching firewall',
+    codeBlock(`${KW('tunnel')}: ${VAL('f1a2b3c4-xxxx')}<br>${KW('ingress')}:<br>  - hostname: ${VAL('erp.company.co.th')}<br>    service: ${VAL('http://localhost:8080')}<br>  - service: ${VAL('http_status:404')}`),true)+
+  exCard(t?'หลาย service บน tunnel เดียว':'Multiple Services, One Tunnel','',
+    codeBlock(`${KW('ingress')}:<br>  - hostname: ${VAL('app.co.th')}   service: ${VAL('http://localhost:3000')}<br>  - hostname: ${VAL('api.co.th')}   service: ${VAL('http://localhost:4000')}<br>  - hostname: ${VAL('ssh.co.th')}   service: ${VAL('ssh://localhost:22')}<br>  - service: ${VAL('http_status:404')}`),true)+
+  exCard('Docker Compose','',
+    codeBlock(`${KW('services')}:<br>  app:<br>    image: ${VAL('myapp:latest')}<br>  cloudflared:<br>    image: ${VAL('cloudflare/cloudflared:latest')}<br>    command: tunnel --no-autoupdate run<br>    environment:<br>      - ${VAL('TUNNEL_TOKEN=eyJhI...')}`),true)
+}
+function s4(lang){
+  const t=lang==='th';
+  return hl(t?'Gateway ทำงานเป็น <strong style="color:var(--text)">DNS resolver + HTTP proxy</strong> — บังคับ traffic ทั้งหมดผ่านการตรวจสอบ':'Gateway operates as a <strong style="color:var(--text)">DNS resolver + HTTP proxy</strong> — forces all traffic through inspection.')+
+  grid3(
+    card('🔍','DNS Filtering',t?'บล็อก domain อันตรายระดับ DNS ก่อน connection เกิด':'Blocks dangerous domains at DNS level before connection.','',''),
+    card('🔐','HTTP/S Inspection',t?'ถอดรหัส TLS ตรวจ content บล็อก malware':'Decrypts TLS, inspects content, blocks malware.','',''),
+    card('🎮','App Control',t?'ควบคุมระดับ action เช่น allow อ่าน แต่บล็อก upload':'Action-level control e.g. allow read but block upload.','','')
+  )+
+  exCard(t?'บล็อก Malware อัตโนมัติ':'Auto-Block Malware','',
+    codeBlock(`${KW('Rule:')} Block  ${CM('# DNS Policy')}<br>  ${KW('IF')} Security category ${KW('IN')} [<br>    ${VAL('Malware, Phishing,')}<br>    ${VAL('Command and Control, Cryptomining')}<br>  ]`),true)+
+  exCard(t?'Social Media เฉพาะนอกเวลางาน':'Social Media Outside Work Hours','',
+    codeBlock(`${KW('Rule:')} Block  ${CM('# HTTP Policy')}<br>  ${KW('IF')} category = ${VAL('Social Media')}<br>  ${KW('AND')} group = ${VAL('general-staff')}<br>  ${KW('AND')} time = ${VAL('Mon-Fri 08:00-17:00')}`),true)+
+  exCard(t?'บล็อก Upload ไป Personal Cloud':'Block Upload to Personal Cloud','',
+    codeBlock(`${KW('Rule:')} Block  ${CM('# HTTP + TLS decrypt')}<br>  ${KW('IF')} Application = ${VAL('Google Drive')}<br>  ${KW('AND')} method ${KW('IN')} [${VAL('POST, PUT')}]<br>  ${KW('AND')} domain ${KW('NOT')} = ${VAL('company.com')}`),true)
+}
+function s5(lang){
+  const t=lang==='th';
+  return hl(t?'<strong style="color:var(--text)">Posture Check</strong> = เงื่อนไขที่ต้องผ่านก่อน — ถ้า device ไม่ compliant จะถูก block หรือให้เข้าได้แค่บางแอป':'<strong style="color:var(--text)">Posture Check</strong> = prerequisite conditions — non-compliant device gets blocked or limited app access.')+
+  grid2(
+    card('💻','OS Version',t?'macOS >= 13.x, Windows ต้อง patch ล่าสุด':'macOS >= 13.x, Windows must have latest patches.','',''),
+    card('🔐','Disk Encryption',t?'ตรวจ FileVault (mac) หรือ BitLocker (Windows)':'Checks FileVault (Mac) or BitLocker (Windows).','',''),
+    card('🛡️','Firewall / AV',t?'ตรวจว่า firewall และ antivirus รันอยู่':'Verifies OS firewall and antivirus are running.','',''),
+    card('📡','WARP enabled',t?'ตรวจว่า WARP ทำงานอยู่ ถ้าไม่มีก็เข้าไม่ได้':'Verifies WARP Client is running.','','')
+  )+
+  exCard(t?'บังคับ Disk Encryption':'Require Disk Encryption','',
+    codeBlock(`${KW('Posture:')} Disk Encryption<br>  macOS: ${VAL('FileVault = enabled')}<br>  Windows: ${VAL('BitLocker = enabled')}<br>${KW('Access Rule:')} Allow group = ${VAL('finance')}<br>  ${KW('AND')} posture = ${VAL('disk-encryption ✓')}`),true)+
+  exCard(t?'OS Version ก่อนเข้า Production':'OS Version Check','',
+    codeBlock(`${KW('Posture:')} OS Version<br>  macOS >= ${VAL('14.0')}  Windows >= ${VAL('22H2')}<br>${KW('Access Rule:')} Allow group = ${VAL('devops')}<br>  ${KW('AND')} posture = ${VAL('os-version ✓')}`),true)+
+  exCard(t?'MDM Serial Number Allowlist':'MDM Allowlist','',
+    codeBlock(`${KW('Posture:')} Jamf Pro Integration<br>  Device managed = ${VAL('true')}<br>  Compliance = ${VAL('pass')}<br>${CM(t?'# device ที่ไม่ได้ enroll Jamf → เข้าไม่ได้':'# devices not enrolled in Jamf → blocked')}`),true)
+}
+function s6(lang){
+  const t=lang==='th';
+  return hl(t?'WARP ส่ง traffic ผ่าน Cloudflare, apply Gateway policy, รายงาน posture — ตั้งค่า <strong style="color:var(--text)">split tunnel</strong> เพื่อเลือก traffic':'WARP routes traffic through Cloudflare, applies Gateway policies, reports posture — configure <strong style="color:var(--text)">split tunnel</strong> to select which traffic.')+
+  grid2(
+    card('🖥️',t?'รองรับ OS':'Supported OS','Windows 10/11 · macOS 10.15+<br>iOS 14+ · Android 5+<br>Linux (Ubuntu, CentOS, Arch)','',''),
+    card('🏢',t?'Deploy ด้วย MDM':'Deploy via MDM',t?'Jamf, Intune, SCCM push config ให้ทุก device อัตโนมัติ':'Jamf, Intune, SCCM push config to all devices automatically.','','')
+  )+
+  exCard(t?'Split Tunnel เข้า On-Prem':'Split Tunnel for On-Prem','',
+    codeBlock(`${CM(t?'# Include mode: ส่งเฉพาะ internal ผ่าน WARP':'# Include mode: only internal routes via WARP')}<br>${KW('Include:')}<br>  ${VAL('10.0.0.0/8')}    → internal DC<br>  ${VAL('172.16.0.0/12')} → Azure VNet<br>  ${VAL('erp.co.th')}    → internal hostname`),true)+
+  exCard(t?'Deploy ผ่าน Intune':'Deploy via Intune','',
+    codeBlock(`msiexec /i ${VAL('Cloudflare_WARP.msi')} /quiet<br>  ORGANIZATION=${VAL('"company-team"')}<br>  ONBOARDING=${VAL('false')}<br>${CM(t?'# WARP auto-connects on boot':'# WARP auto-connects on boot')}`),true)+
+  exCard(t?'Local Domain Fallback':'Local Domain Fallback','',
+    codeBlock(`${CM(t?'# DNS ไปยัง .local → ข้าม Gateway':'# DNS to .local → bypass Gateway')}<br>${KW('Fallback domains:')}<br>  ${VAL('corp.local')}      → ${VAL('10.0.0.53')}<br>  ${VAL('internal.co.th')}  → ${VAL('10.0.0.53')}`),true)
+}
+function s7(lang){
+  const t=lang==='th';
+  return hl(t?'6 ขั้นตอนหลัก — ทำตามลำดับ <strong style="color:var(--text)">เริ่มจาก Identity ก่อนเสมอ</strong>':'6 main deployment steps — follow in order, <strong style="color:var(--text)">always start with Identity first</strong>.')+
+  step(1,t?'สมัคร Cloudflare Zero Trust':'Sign up for Cloudflare Zero Trust',t?'one.dash.cloudflare.com → Zero Trust — Free tier รองรับ 50 users':'one.dash.cloudflare.com → Zero Trust — Free tier supports 50 users')+
+  step(2,t?'เชื่อม Identity Provider':'Connect Identity Provider',t?'Settings → Authentication → Okta / Azure AD / Google / GitHub':'Settings → Authentication → Okta / Azure AD / Google / GitHub')+
+  step(3,t?'ติดตั้ง cloudflared บน server':'Install cloudflared on server',t?'สร้าง tunnel → map hostname กับ internal service':'Create tunnel → map hostname to internal service')+
+  step(4,t?'สร้าง Access Application + Policy':'Create Access Application + Policy',t?'Access → Applications → Self-hosted → ตั้ง policy':'Access → Applications → Self-hosted → set policy')+
+  step(5,t?'Deploy WARP Client ให้ Users':'Deploy WARP Client to Users',t?'Settings → WARP → Enrollment policy → push ผ่าน MDM':'Settings → WARP → Enrollment policy → push via MDM')+
+  step(6,t?'ตั้ง Gateway Policy':'Configure Gateway Policy',t?'Gateway → Firewall Policies → DNS / HTTP — เพิ่ม rule':'Gateway → Firewall Policies → DNS / HTTP — add rules')+div_()+sHead(t?'3 สถานการณ์องค์กรไทย':'3 Thai Organization Scenarios')+
+  exCard(t?'SME 20 คน ไม่มี IT team':'SME 20 people, no IT team','',
+    codeBlock(`${CM(t?'# ทำทั้งหมดได้ฟรี':'# Everything free')}<br>1. ${t?'สมัคร':'Sign up'} ZT Free (50 users)<br>2. ${t?'เชื่อม':'Connect'} Google Workspace ${t?'เป็น':'as'} IdP<br>3. ${t?'ติดตั้ง':'Install'} cloudflared ${t?'บน':'on'} NAS/PC<br>4. ${t?'Allow':'Allow'} @company.com<br>${CM(t?'# ค่าใช้จ่าย: $0/เดือน':'# Cost: $0/month')}`),true)+
+  exCard(t?'บริษัท 200+ คน มี Azure AD':'200+ person company, Azure AD','',
+    codeBlock(`${CM(t?'# Phase 1: Access':'# Phase 1: Access')}<br>${t?'เชื่อม':'Connect'} Azure AD, migrate ERP/SAP/Jira<br>${CM(t?'# Phase 2: Gateway + WARP':'# Phase 2: Gateway + WARP')}<br>Deploy WARP ${t?'ผ่าน':'via'} Intune<br>${CM(t?'# Phase 3: ปิด VPN เดิม':'# Phase 3: Shut down old VPN')}`),true)+
+  exCard(t?'Multi-branch 10 จังหวัด':'Multi-branch 10 provinces','',
+    codeBlock(`cloudflared tunnel create ${VAL('branch-chiangmai')}<br>cloudflared tunnel create ${VAL('branch-phuket')}<br>${CM(t?'# ทุกสาขา install WARP':'# All branches install WARP')}<br>${CM(t?'# Split tunnel — internal ผ่าน tunnel':'# Split tunnel — internal via tunnel')}`),true)
+}
+function s8(lang){
+  const t=lang==='th';
+  const rows=t?[
+    ['Access','VPN / Bastion','ควบคุมเข้าแอป internal, SSH, RDP','pill-cf','แนะนำ'],
+    ['Tunnel','Reverse proxy / DMZ','เชื่อม server ไม่เปิด port','pill-ok','ไม่ต้อง'],
+    ['Gateway','Proxy / DNS filter','กรอง internet, บล็อก malware','pill-danger','ต้องมี'],
+    ['Device Posture','MDM policy','ตรวจ OS, encryption, AV','pill-danger','ต้องมี'],
+    ['CASB','Cloud security broker','ตรวจ misconfiguration ใน SaaS','pill-ok','ไม่ต้อง'],
+    ['DLP','Data loss prevention','สกัดข้อมูลสำคัญไม่ให้รั่ว','pill-danger','ต้องมี'],
+  ]:[
+    ['Access','VPN / Bastion','Control access to internal apps, SSH, RDP','pill-cf','Recommended'],
+    ['Tunnel','Reverse proxy / DMZ','Connect server without opening ports','pill-ok','Not needed'],
+    ['Gateway','Proxy / DNS filter','Filter internet, block malware','pill-danger','Required'],
+    ['Device Posture','MDM policy','Check OS, encryption, AV','pill-danger','Required'],
+    ['CASB','Cloud security broker','Audit misconfiguration in SaaS','pill-ok','Not needed'],
+    ['DLP','Data loss prevention','Prevent sensitive data leakage','pill-danger','Required'],
+  ];
+  return`<div style="overflow-x:auto;margin-bottom:20px"><table class="ref-table"><thead><tr><th>Product</th><th>${t?'แทนอะไร':'Replaces'}</th><th>${t?'Use case หลัก':'Main Use Case'}</th><th>${t?'ต้องการ WARP?':'Requires WARP?'}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td><span class="pill ${r[3]}">${r[4]}</span></td></tr>`).join('')}</tbody></table></div>`+div_()+sHead(t?'เลือก plan ตามขนาดองค์กร':'Choose plan by organization size')+
+  grid3(
+    card('',t?'Free Plan':'Free Plan',`50 users<br>Access + Gateway<br>Tunnel ไม่จำกัด<br>${t?'เหมาะ SME':'Ideal for SMEs'}`.replace('<br>','<br>'),'pill-ok','Free'),
+    card('',t?'Teams / Business':'Teams / Business',`$7/user/${t?'เดือน':'month'}<br>+ Device Posture<br>+ DLP Basic<br>+ Priority support`,'pill-blue','Teams'),
+    card('',t?'Enterprise':'Enterprise',`${t?'ราคาตามตกลง':'Custom pricing'}<br>+ CASB + Advanced DLP<br>+ SIEM integration<br>+ SLA 99.99%`,'pill-cf','Enterprise')
+  )
+}
+
+
+/* ── Quiz bank: 15 questions per language ── */
+const QUIZ_BANK={
+  th:[
+    {q:'cloudflared ทำงานอย่างไรในแง่ network security?',opts:['เปิด inbound port 443 รับ connection จาก Cloudflare','สร้าง outbound connection จาก server ไปหา Cloudflare — ไม่เปิด inbound port','ทำงานเหมือน VPN เปิด port 1194 UDP'],correct:1,ok:'✓ cloudflared ไม่ต้องเปิด inbound port — ปลอดภัยกว่า VPN มาก',bad:'✗ cloudflared สร้าง outbound connection จาก server ไปหา Cloudflare ไม่ต้องเปิด port ใด'},
+    {q:'ถ้าต้องการบล็อก malware โดยไม่ต้อง maintain blocklist เอง ใช้ product ไหน?',opts:['Cloudflare Access — ตั้ง policy บล็อก IP','Cloudflare Gateway — ใช้ Security category กรองอัตโนมัติ','CASB — ตรวจ SaaS misconfiguration'],correct:1,ok:'✓ Gateway ใช้ threat intelligence ของ Cloudflare กรองอัตโนมัติ',bad:'✗ Cloudflare Gateway มี Security category ที่ Cloudflare อัปเดตตลอด'},
+    {q:'Device Posture Check ต่างจาก Access Policy อย่างไร?',opts:['เหมือนกันทุกอย่าง','Access Policy ตรวจ device, Posture ตรวจ identity','Access Policy ตรวจ identity/group/country, Posture ตรวจสุขภาพ device'],correct:2,ok:'✓ Access Policy = ใครเข้าได้, Posture = device ปลอดภัยพอไหม',bad:'✗ Access Policy ดู identity (email, group), Posture ดู device health (OS, encryption, AV)'},
+    {q:'หลักการ "Never Trust, Always Verify" หมายความว่าอะไร?',opts:['ห้ามเชื่อผู้ใช้ใหม่','ทุก request ต้องตรวจสอบทุกครั้ง ไม่ว่าจะอยู่ใน network ไหน','ต้องเปลี่ยน password ทุกสัปดาห์'],correct:1,ok:'✓ แม้อยู่ใน internal network ก็ต้องตรวจสอบทุกครั้ง',bad:'✗ หมายถึงทุก request ต้องผ่านการตรวจสอบ ไม่ว่าจะมาจากที่ไหน'},
+    {q:'WARP Client ทำหน้าที่อะไร?',opts:['เป็น Identity Provider','ส่ง traffic ผ่าน Cloudflare, apply Gateway policy, รายงาน posture','เป็น firewall หลัก'],correct:1,ok:'✓ WARP เป็น agent หลักที่เชื่อม device เข้าสู่ Cloudflare network',bad:'✗ WARP ทำหน้าที่ส่ง traffic, apply policy, รายงาน posture'},
+    {q:'Least Privilege คืออะไร?',opts:['ให้สิทธิ์เข้าถึงทุก resource','ให้เข้าได้เฉพาะ app ที่จำเป็น ไม่ใช่ทั้ง network','ลดจำนวน user ใน org'],correct:1,ok:'✓ Least Privilege ลด attack surface โดยจำกัดสิทธิ์เฉพาะสิ่งที่จำเป็น',bad:'✗ Least Privilege หมายถึงให้เข้าได้เฉพาะสิ่งที่จำเป็น'},
+    {q:'Cloudflare Tunnel แตกต่างจาก Reverse Proxy อย่างไร?',opts:['ต้องเปิด port 443','สร้าง outbound connection ไม่ต้องเปิด inbound port','ต้องมี SSL cert ของตัวเอง'],correct:1,ok:'✓ Tunnel ปลอดภัยกว่าเพราะไม่ต้องเปิด port หรือมี public IP',bad:'✗ Tunnel สร้าง outbound connection ไม่ต้องเปิด inbound port'},
+    {q:'Split Tunnel แบบ Include mode ทำงานอย่างไร?',opts:['traffic ทั้งหมดผ่าน WARP','เฉพาะ traffic ที่ระบุในรายการผ่าน WARP','WARP ถูกปิดการใช้งาน'],correct:1,ok:'✓ Include mode ส่งเฉพาะ internal traffic ผ่าน WARP',bad:'✗ Include mode ส่งเฉพาะ traffic ที่กำหนดผ่าน WARP ไม่ใช่ทั้งหมด'},
+    {q:'CASB ทำอะไร?',opts:['ควบคุม access ไปยัง internal app','ตรวจสอบ misconfiguration และข้อมูลหลุดใน SaaS เช่น Google Drive','กรอง DNS ขาออก'],correct:1,ok:'✓ CASB ตรวจ SaaS ว่ามีการตั้งค่าผิดหรือข้อมูลถูก share โดยไม่ตั้งใจ',bad:'✗ CASB ทำงานกับ SaaS เพื่อตรวจ misconfiguration'},
+    {q:'Cloudflare Access Free tier รองรับกี่ users?',opts:['10 users','50 users','100 users'],correct:1,ok:'✓ Free tier รองรับ 50 users พร้อม Access + Gateway + Tunnel',bad:'✗ Free tier รองรับ 50 users'},
+    {q:'DLP ย่อมาจากอะไร?',opts:['Dynamic Link Protocol','Data Loss Prevention','Device Location Policy'],correct:1,ok:'✓ DLP = Data Loss Prevention ป้องกันข้อมูลสำคัญรั่วออก',bad:'✗ DLP = Data Loss Prevention'},
+    {q:'เมื่อต้องการให้ Vendor เข้าระบบชั่วคราว ควรใช้อะไร?',opts:['IP Allowlist','Access Policy ที่มี session duration และ expiry date','VPN account'],correct:1,ok:'✓ Access Policy กำหนด session duration และวันหมดอายุได้',bad:'✗ ควรใช้ Access Policy ที่มี expiry date'},
+    {q:'Local Domain Fallback ช่วยแก้ปัญหาอะไร?',opts:['เพิ่มความเร็ว internet','DNS query ของ internal domain ข้าม Gateway ไปหา DNS server เดิม','บล็อก malware จาก local'],correct:1,ok:'✓ ช่วยให้ printer, AD, internal hostname ยังทำงานได้ปกติ',bad:'✗ Local Domain Fallback ช่วยให้ DNS query ของ internal domain ไปหา DNS เดิมได้'},
+    {q:'Assume Breach หมายความว่าอะไร?',opts:['บริษัทถูก hack แน่นอน','ออกแบบโดยสมมติว่าถูกเจาะแล้ว เพื่อจำกัด lateral movement','ต้องเปลี่ยน password เมื่อถูก breach'],correct:1,ok:'✓ Assume Breach ทำให้ออกแบบระบบที่จำกัดความเสียหายแม้ถูกเจาะ',bad:'✗ เป็นหลักการออกแบบ ไม่ได้แปลว่าถูก hack จริง'},
+    {q:'Gateway DNS Policy ต่างจาก HTTP Policy อย่างไร?',opts:['DNS เร็วกว่าแต่ดูแลน้อยกว่า, HTTP ตรวจ content ได้ละเอียดกว่า','เหมือนกัน','DNS ตรวจ HTTPS เท่านั้น'],correct:0,ok:'✓ DNS บล็อกก่อน connection เกิด (เร็ว), HTTP ถอดรหัส TLS ตรวจ content ลึกกว่า',bad:'✗ DNS บล็อกก่อน connection, HTTP ตรวจ content ได้ละเอียดกว่า'},
+  ],
+  en:[
+    {q:'How does cloudflared work from a network security perspective?',opts:['Opens inbound port 443 to receive connections','Creates outbound connection from server to Cloudflare — no inbound port needed','Works like a VPN, opens port 1194 UDP'],correct:1,ok:'✓ cloudflared creates outbound connection — no inbound ports needed, far more secure.',bad:'✗ cloudflared creates outbound connection from server. No ports need to be opened.'},
+    {q:'To block malware without maintaining your own blocklist, which product do you use?',opts:['Cloudflare Access — set policy to block IPs','Cloudflare Gateway — uses Security categories for automatic filtering','CASB — audits SaaS misconfiguration'],correct:1,ok:'✓ Gateway uses Cloudflare threat intelligence to filter malware/phishing automatically.',bad:'✗ Cloudflare Gateway has Security categories that Cloudflare keeps updated.'},
+    {q:'How does Device Posture Check differ from Access Policy?',opts:["They're identical","Access Policy checks device, Posture checks identity","Access Policy checks identity/group/country, Posture checks device health"],correct:2,ok:'✓ Access Policy = who can enter (identity), Posture = is the device safe enough.',bad:'✗ Access Policy checks identity (email, group), Posture checks device health (OS, encryption, AV).'},
+    {q:'What does "Never Trust, Always Verify" mean?',opts:['Never trust new users','Every request must be verified every time, regardless of network','Passwords must be changed weekly'],correct:1,ok:'✓ Even inside the internal network, every request must be verified every time.',bad:"✗ It means every request must be verified, regardless of where it's from."},
+    {q:'What role does the WARP Client play?',opts:['Acts as Identity Provider','Routes traffic through Cloudflare, applies Gateway policies, reports device posture','Acts as the main firewall'],correct:1,ok:"✓ WARP is the primary agent that connects user devices to Cloudflare's network.",bad:"✗ WARP routes traffic, applies policies, and reports posture — it's not an IdP."},
+    {q:'What is Least Privilege?',opts:['Grant access to all resources','Grant access only to apps necessary for work, not the entire network','Reduce number of users'],correct:1,ok:"✓ Least Privilege reduces attack surface by limiting permissions to only what's necessary.",bad:"✗ Least Privilege means access only to what's necessary."},
+    {q:'How does Cloudflare Tunnel differ from a Reverse Proxy?',opts:['Requires opening port 443','Creates outbound connection — no inbound port or public IP needed','Requires its own SSL certificate'],correct:1,ok:"✓ Tunnel is more secure — no ports or public IP required.",bad:'✗ Tunnel creates outbound connections — no inbound ports needed at all.'},
+    {q:'When using WARP Split Tunnel in Include mode, what happens?',opts:['All traffic goes through WARP','Only specified traffic goes through WARP','WARP is disabled'],correct:1,ok:'✓ Include mode sends only internal traffic through WARP, reducing general internet latency.',bad:'✗ Include mode sends only specified traffic through WARP, not all traffic.'},
+    {q:'What does CASB do in Cloudflare Zero Trust?',opts:['Controls access to internal apps','Audits misconfiguration and data leakage in SaaS apps like Google Drive','Filters outbound DNS queries'],correct:1,ok:'✓ CASB checks SaaS apps for misconfigurations or unintentional data sharing.',bad:'✗ CASB works with SaaS applications to check for misconfigurations.'},
+    {q:'How many users does the Cloudflare Access Free plan support?',opts:['10 users','50 users','100 users'],correct:1,ok:'✓ Free tier supports 50 users with Access + Gateway + Unlimited Tunnel.',bad:'✗ Free tier supports 50 users.'},
+    {q:'What does DLP stand for?',opts:['Dynamic Link Protocol','Data Loss Prevention','Device Location Policy'],correct:1,ok:'✓ DLP = Data Loss Prevention — prevents sensitive data from leaking.',bad:'✗ DLP = Data Loss Prevention.'},
+    {q:'For temporary vendor access that auto-expires, what should you use?',opts:['IP Allowlist','Access Policy with session duration and expiry date','VPN account'],correct:1,ok:'✓ Access Policy can set session duration and expiry date — auto-expires.',bad:'✗ Use an Access Policy with session duration and expiry date.'},
+    {q:'What problem does Local Domain Fallback in WARP solve?',opts:['Increases internet speed','DNS queries for internal domains bypass Gateway to the original DNS server','Blocks local network malware'],correct:1,ok:'✓ Ensures printers, AD, internal hostnames still work normally with WARP enabled.',bad:'✗ Local Domain Fallback routes internal domain DNS to the original DNS server.'},
+    {q:'What does "Assume Breach" mean in Zero Trust?',opts:["The company has definitely been hacked","Design assuming already compromised, to limit lateral movement","Must change passwords when breached"],correct:1,ok:'✓ Assume Breach means designing systems that limit damage even if compromised.',bad:"✗ It's a design principle — it doesn't mean you've actually been hacked."},
+    {q:'How does Gateway DNS Policy differ from HTTP Policy?',opts:['DNS is faster but less granular; HTTP can inspect content in more detail','They are identical','DNS only checks HTTPS'],correct:0,ok:'✓ DNS blocks at domain resolution (fast); HTTP decrypts TLS for deeper content inspection.',bad:'✗ DNS blocks before connection occurs; HTTP can inspect content in more detail.'},
+  ]
+};
+
+function buildQuizSlide(lang){
+  const t=T[lang];
+  const bank=QUIZ_BANK[lang];
+  const sel=quizSession.questions;
+  let html='<div id="quiz-container">';
+  sel.forEach((qi,pos)=>{
+    const q=bank[qi];
+    html+=`<div style="margin-bottom:24px" id="qq-block-${pos}">
+      <div style="font-size:calc(var(--fs)*.8125);font-weight:600;color:var(--text);margin-bottom:12px;display:flex;gap:8px;align-items:flex-start">
+        <span style="background:rgba(244,129,32,.15);color:var(--cf);border-radius:6px;padding:2px 8px;font-size:11px;font-family:'Space Mono',monospace;flex-shrink:0">Q${pos+1}</span>
+        ${q.q}
+      </div>
+      <div id="qq${pos}-opts">
+        ${q.opts.map((o,oi)=>`<div class="qopt" style="margin-bottom:8px" onclick="answerQ(this,${oi===q.correct},${pos})">${o}</div>`).join('')}
+      </div>
+      <div id="qq${pos}-ok" style="display:none;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:10px 14px;font-size:calc(var(--fs)*.75);color:var(--ok);margin-top:8px;line-height:1.6">${q.ok}</div>
+      <div id="qq${pos}-bad" style="display:none;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:10px 14px;font-size:calc(var(--fs)*.75);color:var(--danger);margin-top:8px;line-height:1.6">${q.bad}</div>
+    </div><div class="section-divider"></div>`;
+  });
+  html+=`<div id="quiz-summary" style="display:none;margin-top:24px;background:rgba(244,129,32,.06);border:1px solid rgba(244,129,32,.2);border-radius:14px;padding:20px;text-align:center">
+    <div style="font-size:32px;margin-bottom:8px" id="quiz-emoji">🎉</div>
+    <div id="quiz-score-text" style="font-size:16px;font-weight:700;color:var(--cf);font-family:'Space Mono',monospace"></div>
+    <div id="quiz-score-sub" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap">
+      <button onclick="resetQuiz()" style="background:var(--cf);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer">${t.retakeQuiz}</button>
+      <button onclick="openCertModal()" style="background:var(--card);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer"><i class="fa fa-certificate" style="color:var(--cf)"></i> ${t.getCert}</button>
+    </div>
+  </div></div>`;
+  return html;
+}
+
+function getSlideContent(idx,lang){
+  switch(idx){
+    case 0:return lang==='th'?s0_th():s0_en();
+    case 1:return lang==='th'?s1_th():s1_en();
+    case 2:return s2(lang);
+    case 3:return s3(lang);
+    case 4:return s4(lang);
+    case 5:return s5(lang);
+    case 6:return s6(lang);
+    case 7:return s7(lang);
+    case 8:return s8(lang);
+    case 9:return buildQuizSlide(lang);
+    default:return '';
+  }
+}
+
+const WORD_COUNTS=[320,260,380,360,340,320,320,420,280,150];
+
+
+/* ── State ── */
+const TOTAL=10;
+let cur=0,lang='th',lightMode=false,fontSize=16;
+let completed=new Set(),bookmarks=new Set();
+let quizAnswered={},quizCorrect=0;
+let quizSession={questions:[],answered:{}};
+let notes={},timeSpent=0,startTime=Date.now();
+let timerInterval,collapsedGroups=new Set();
+
+/* ── localStorage (validated) ── */
+const LS='zt_v3_';
+function saveState(){
+  try{
+    localStorage.setItem(LS+'lang',lang);
+    localStorage.setItem(LS+'cur',cur);
+    localStorage.setItem(LS+'completed',JSON.stringify([...completed]));
+    localStorage.setItem(LS+'bookmarks',JSON.stringify([...bookmarks]));
+    localStorage.setItem(LS+'quizAnswered',JSON.stringify(quizAnswered));
+    localStorage.setItem(LS+'quizCorrect',quizCorrect);
+    localStorage.setItem(LS+'quizSession',JSON.stringify(quizSession));
+    localStorage.setItem(LS+'notes',JSON.stringify(notes));
+    localStorage.setItem(LS+'time',timeSpent+Math.floor((Date.now()-startTime)/60000));
+    localStorage.setItem(LS+'lightMode',lightMode);
+    localStorage.setItem(LS+'fontSize',fontSize);
+    localStorage.setItem(LS+'collapsedGroups',JSON.stringify([...collapsedGroups]));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    const sl=localStorage.getItem(LS+'lang');
+    if(sl==='th'||sl==='en')lang=sl;
+    const sc=validateInt(localStorage.getItem(LS+'cur'),0);
+    if(sc>0&&sc<TOTAL){window._resumeCur=sc;}
+    cur=0;
+    completed=validateSet(localStorage.getItem(LS+'completed'),new Set());
+    bookmarks=validateSet(localStorage.getItem(LS+'bookmarks'),new Set());
+    const qa=validateObj(localStorage.getItem(LS+'quizAnswered'),{});
+    quizAnswered=qa;
+    quizCorrect=validateInt(localStorage.getItem(LS+'quizCorrect'),0);
+    if(quizCorrect<0||quizCorrect>15)quizCorrect=0;
+    const qs=validateObj(localStorage.getItem(LS+'quizSession'),{});
+    quizSession=(qs.questions&&Array.isArray(qs.questions)&&qs.questions.length===5)?qs:{questions:[],answered:{}};
+    const rawN=validateObj(localStorage.getItem(LS+'notes'),{});
+    notes={};
+    Object.entries(rawN).forEach(([k,v])=>{
+      if(/^\d+$/.test(k)&&typeof v==='string')notes[k]=v.slice(0,5000);
+    });
+    timeSpent=validateInt(localStorage.getItem(LS+'time'),0);
+    if(timeSpent<0||timeSpent>100000)timeSpent=0;
+    lightMode=validateBool(localStorage.getItem(LS+'lightMode'),false);
+    const fs=validateInt(localStorage.getItem(LS+'fontSize'),16);
+    if(fs>=12&&fs<=22)fontSize=fs;
+    try{
+      const cg=JSON.parse(localStorage.getItem(LS+'collapsedGroups')||'[]');
+      if(Array.isArray(cg))collapsedGroups=new Set(cg.filter(x=>typeof x==='number'));
+    }catch{}
+  }catch(e){}
+}
+
+/* ── Quiz session ── */
+function newQuizSession(){
+  const bank=QUIZ_BANK[lang];
+  const idx=[...Array(bank.length).keys()];
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+  quizSession={questions:idx.slice(0,5),answered:{}};
+  quizAnswered={};quizCorrect=0;
+}
+
+/* ── Navigation ── */
+function jump(n){
+  completed.add(cur);cur=n;
+  render();saveState();closeSidebar();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(d){jump(Math.max(0,Math.min(TOTAL-1,cur+d)));}
+
+/* ── Render ── */
+function render(){
+  const t=T[lang],meta=t.slides[cur];
+  safeText(document.getElementById('chapter-label'),meta.chapter);
+  const mins=Math.max(1,Math.round((WORD_COUNTS[cur]||200)/200));
+  safeText(document.getElementById('read-time-text'),`${mins} ${t.readMin}`);
+  const cont=document.getElementById('slide-container');
+  cont.classList.remove('slide-enter');void cont.offsetWidth;cont.classList.add('slide-enter');
+  cont.innerHTML=`<div class="slide-page"><div style="margin-bottom:20px"><h1 style="font-size:calc(var(--fs)*1.5);font-weight:700;color:var(--text);line-height:1.2;margin:0 0 6px">${meta.title}</h1><p style="font-size:calc(var(--fs)*.875);color:var(--dim);line-height:1.5;margin:0">${meta.sub}</p></div>${getSlideContent(cur,lang)}</div>`;
+  if(cur===9)restoreQuizState();
+  const pct=((cur+1)/TOTAL*100).toFixed(0);
+  const hp=document.getElementById('header-prog');if(hp)hp.style.width=pct+'%';
+  safeText(document.getElementById('header-prog-text'),`${cur+1}/${TOTAL}`);
+  const dn=document.getElementById('dot-nav');
+  if(dn){
+    dn.innerHTML='';
+    for(let i=0;i<TOTAL;i++){
+      const d=document.createElement('div');
+      d.className='dot-nav'+(i===cur?' active':completed.has(i)?' done':'');
+      d.title=t.slides[i].title;d.onclick=()=>jump(i);
+      dn.appendChild(d);
+    }
+  }
+  safeText(document.getElementById('page-info'),`${cur+1} / ${TOTAL}`);
+  const bp=document.getElementById('btn-prev'),bn=document.getElementById('btn-next');
+  if(bp){bp.disabled=cur===0;safeText(document.getElementById('btn-prev-text'),t.btnPrev);}
+  if(bn){bn.disabled=cur===TOTAL-1;safeText(document.getElementById('btn-next-text'),cur===TOTAL-1?t.btnFinish:t.btnNext);}
+  const fbm=document.getElementById('fab-bm');
+  if(fbm)fbm.className='fab-btn'+(bookmarks.has(cur)?' bookmarked':'');
+  const fn=document.getElementById('fab-note');
+  if(fn)fn.className='fab-btn'+(notes[cur]&&notes[cur].trim()?' active-note':'');
+  safeText(document.getElementById('notes-title'),t.notesTitle+(cur+1));
+  const ta=document.getElementById('notes-textarea');if(ta)ta.value=notes[cur]||'';
+  renderSidebar();renderStats();
+}
+
+function renderSidebar(){
+  const t=T[lang],nav=document.getElementById('sidebar-nav');
+  if(!nav)return;
+  nav.innerHTML='';
+  (t.chapterGroups||[]).forEach((grp,gi)=>{
+    const h=document.createElement('div');
+    h.className='ch-group-header'+(collapsedGroups.has(gi)?' collapsed':'');
+    h.innerHTML=`<span>${grp.label}</span><i class="fa fa-chevron-down ch-arrow"></i>`;
+    h.onclick=()=>toggleChapterGroup(gi);
+    nav.appendChild(h);
+    const items=document.createElement('div');
+    items.className='ch-group-items';
+    items.style.maxHeight=collapsedGroups.has(gi)?'0':'500px';
+    grp.slides.forEach(i=>{
+      const si=t.sidebar[i];
+      const el=document.createElement('div');
+      el.className='sidebar-item'+(i===cur?' active':'');
+      const isDone=completed.has(i)&&i!==cur;
+      const hasBm=bookmarks.has(i);
+      const hasNote=notes[i]&&notes[i].trim();
+      el.innerHTML=`<i class="fa-solid ${si.icon}" style="font-size:13px;width:16px;text-align:center;flex-shrink:0"></i><span style="flex:1;line-height:1.3">${si.label}</span>${isDone?'<i class="fa-solid fa-check-circle" style="font-size:11px;color:var(--ok)"></i>':''}${hasBm?'<div class="bm-dot"></div>':''}${hasNote?'<div class="note-dot"></div>':''}`;
+      el.onclick=()=>jump(i);items.appendChild(el);
+    });
+    nav.appendChild(items);
+  });
+  const bms=document.getElementById('bookmarks-section'),bmn=document.getElementById('bookmarks-nav');
+  if(bms&&bmn){
+    if(bookmarks.size>0){
+      bms.style.display='block';bmn.innerHTML='';
+      safeText(document.getElementById('bm-label'),t.bmLabel);
+      bookmarks.forEach(i=>{
+        const el=document.createElement('div');
+        el.className='sidebar-item'+(i===cur?' active':'');
+        el.innerHTML=`<i class="fa-solid fa-bookmark" style="font-size:12px;color:var(--cf);width:16px;text-align:center"></i><span style="flex:1;font-size:12px">${t.slides[i].title}</span>`;
+        el.onclick=()=>jump(i);bmn.appendChild(el);
+      });
+    }else bms.style.display='none';
+  }
+}
+
+function renderStats(){
+  const t=T[lang];
+  safeText(document.getElementById('stat-completed'),completed.size);
+  safeText(document.getElementById('stat-quiz'),quizCorrect);
+  safeText(document.getElementById('stat-time'),timeSpent+Math.floor((Date.now()-startTime)/60000));
+  safeText(document.getElementById('stat-completed-label'),t.statCompleted);
+  safeText(document.getElementById('stat-quiz-label'),t.statQuiz);
+  safeText(document.getElementById('stat-time-label'),t.statTime);
+  safeText(document.getElementById('nav-label'),t.navLabel);
+  safeText(document.getElementById('stats-label'),t.statsLabel);
+  safeText(document.getElementById('export-notes-label'),t.exportNotes);
+  safeText(document.getElementById('cert-footer-label'),t.certLabel);
+  safeText(document.getElementById('kb-footer-label'),t.kbFooter);
+}
+
+
+/* ── Copy code ── */
+function copyCode(btn){
+  const block=btn.closest('.code-block');
+  const text=block.innerText.replace(/^Copy\n/,'').replace(/^Copied!\n/,'');
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.innerHTML='<i class="fa fa-check"></i> Copied!';
+    btn.style.color='var(--ok)';btn.style.borderColor='rgba(74,222,128,.3)';
+    setTimeout(()=>{btn.innerHTML='<i class="fa fa-copy"></i> Copy';btn.style.color='var(--cf)';btn.style.borderColor='rgba(244,129,32,.2)';},1500);
+  }).catch(()=>{
+    const r=document.createRange();r.selectNode(block);
+    window.getSelection().removeAllRanges();window.getSelection().addRange(r);
+    document.execCommand('copy');window.getSelection().removeAllRanges();
+    btn.innerHTML='<i class="fa fa-check"></i> Copied!';
+    setTimeout(()=>{btn.innerHTML='<i class="fa fa-copy"></i> Copy';},1500);
+  });
+}
+
+/* ── Language ── */
+function setLang(l){
+  if(l!=='th'&&l!=='en')return;
+  lang=l;
+  document.getElementById('lang-th').classList.toggle('active',l==='th');
+  document.getElementById('lang-en').classList.toggle('active',l==='en');
+  const t=T[l];
+  safeText(document.getElementById('h-subtitle'),t.subtitle);
+  document.getElementById('search-input').placeholder=t.searchPH;
+  safeText(document.getElementById('toc-title'),t.tocTitle);
+  safeText(document.getElementById('kb-title'),t.kbTitle);
+  safeText(document.getElementById('cert-modal-title'),t.certTitle);
+  safeText(document.getElementById('cert-modal-sub'),t.certSub);
+  safeText(document.getElementById('cert-gen-btn'),t.certGen);
+  document.getElementById('cert-dl-btn').innerHTML=`<i class="fa fa-download" style="font-size:11px"></i> ${t.certDl}`;
+  document.getElementById('resume-yes').textContent=t.resumeYes;
+  document.documentElement.lang=l;
+  render();saveState();
+}
+
+/* ── Theme & font size ── */
+function toggleTheme(){
+  lightMode=!lightMode;
+  document.getElementById('body-el').classList.toggle('light-mode',lightMode);
+  document.getElementById('theme-icon').className=lightMode?'fa fa-moon':'fa fa-sun';
+  saveState();
+}
+function changeFontSize(d){
+  fontSize=Math.min(22,Math.max(12,fontSize+d));
+  document.documentElement.style.setProperty('--fs',fontSize+'px');
+  showToast('A',`Font: ${fontSize}px`,'var(--cf)');saveState();
+}
+
+/* ── Quiz ── */
+function answerQ(el,correct,pos){
+  if(quizSession.answered&&quizSession.answered[pos]!==undefined)return;
+  if(!quizSession.answered)quizSession.answered={};
+  quizSession.answered[pos]=correct;
+  if(correct)quizCorrect++;
+  const opts=document.getElementById(`qq${pos}-opts`).querySelectorAll('.qopt');
+  opts.forEach(o=>{o.onclick=null;o.style.cursor='default';});
+  el.classList.add(correct?'correct':'wrong');
+  document.getElementById(`qq${pos}-ok`).style.display=correct?'block':'none';
+  document.getElementById(`qq${pos}-bad`).style.display=correct?'none':'block';
+  const total=quizSession.questions.length;
+  if(Object.keys(quizSession.answered).length>=total)setTimeout(showQuizSummary,400);
+  renderStats();saveState();
+}
+function showQuizSummary(){
+  const sum=document.getElementById('quiz-summary');if(!sum)return;
+  const total=quizSession.questions.length;
+  const correct=Object.values(quizSession.answered||{}).filter(Boolean).length;
+  const pct=Math.round(correct/total*100);
+  const emoji=pct>=80?'🎉':pct>=60?'👏':pct>=40?'📚':'🔄';
+  const sub=lang==='th'
+    ?[`ยอดเยี่ยม! ${correct}/${total} ข้อ`,`ดีมาก! ${correct}/${total} ข้อ`,'พอใช้ ลองทบทวน','ลองทำใหม่'][pct>=80?0:pct>=60?1:pct>=40?2:3]
+    :[`Excellent! ${correct}/${total} correct`,`Great! ${correct}/${total} correct`,'Not bad, review the lessons','Try again after reviewing'][pct>=80?0:pct>=60?1:pct>=40?2:3];
+  safeText(document.getElementById('quiz-emoji'),emoji);
+  safeText(document.getElementById('quiz-score-text'),`${correct} / ${total} (${pct}%)`);
+  safeText(document.getElementById('quiz-score-sub'),sub);
+  sum.style.display='block';sum.classList.add('pop-in');
+  if(pct>=80){completed.add(9);if(completed.size>=TOTAL)triggerConfetti();}
+}
+function restoreQuizState(){
+  if(!quizSession.answered)return;
+  Object.entries(quizSession.answered).forEach(([pos,correct])=>{
+    const ok=document.getElementById(`qq${pos}-ok`);
+    const bad=document.getElementById(`qq${pos}-bad`);
+    const opts=document.getElementById(`qq${pos}-opts`);
+    if(!opts)return;
+    opts.querySelectorAll('.qopt').forEach(o=>{o.onclick=null;o.style.cursor='default';});
+    if(ok)ok.style.display=correct?'block':'none';
+    if(bad)bad.style.display=correct?'none':'block';
+  });
+  if(Object.keys(quizSession.answered).length>=(quizSession.questions.length||5))showQuizSummary();
+}
+function resetQuiz(){newQuizSession();saveState();render();}
+
+/* ── Search ── */
+const SIDX=[
+  {i:0,kw:'zero trust vpn never trust verify identity lateral movement wfh contractor posture นโยบาย'},
+  {i:1,kw:'cloudflare platform warp access gateway tunnel casb dlp product overview เครื่องมือ'},
+  {i:2,kw:'access policy idp okta azure ad google github mfa jwt ssh rdp app vendor การเข้าถึง'},
+  {i:3,kw:'tunnel cloudflared outbound port docker compose ingress hostname service container'},
+  {i:4,kw:'gateway swg dns filtering http inspection malware phishing social media block กรอง'},
+  {i:5,kw:'posture check os version disk encryption filevault bitlocker firewall av jamf mdm compliant'},
+  {i:6,kw:'warp client split tunnel intune windows mdm local domain fallback dns agent'},
+  {i:7,kw:'deploy ขั้นตอน sme azure vpn branch chiangmai phuket khonkaen mpls ติดตั้ง'},
+  {i:8,kw:'reference table access tunnel gateway posture casb dlp free plan enterprise price ราคา'},
+  {i:9,kw:'quiz test question answer cloudflared malware gateway posture access policy ทดสอบ'},
+];
+let sTmo;
+const sInput=document.getElementById('search-input');
+const sOver=document.getElementById('search-overlay');
+sInput.addEventListener('input',e=>{
+  clearTimeout(sTmo);const q=e.target.value.trim();
+  if(!q){sOver.style.display='none';return;}
+  sTmo=setTimeout(()=>doSearch(q),200);
+});
+sInput.addEventListener('keydown',e=>{if(e.key==='Escape'){sOver.style.display='none';sInput.value='';}});
+function doSearch(q){
+  const lq=q.toLowerCase(),t=T[lang];
+  const res=SIDX.filter(x=>t.slides[x.i].title.toLowerCase().includes(lq)||t.slides[x.i].chapter.toLowerCase().includes(lq)||x.kw.includes(lq));
+  const list=document.getElementById('search-results-list');
+  if(!res.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon"><i class="fa fa-magnifying-glass"></i></div><div style="font-size:14px;font-weight:600;color:var(--text)">${t.searchEmpty} "${q}"</div><div style="font-size:12px;color:var(--dim)">${t.searchHint}</div></div>`;
+  }else{
+    list.innerHTML='';
+    const hd=document.createElement('div');hd.style.cssText='font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px';
+    hd.textContent=`${t.searchResults} (${res.length})`;list.appendChild(hd);
+    res.forEach(r=>{
+      const el=document.createElement('div');
+      el.style.cssText='display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface);margin-bottom:8px;transition:all .18s';
+      const num=document.createElement('div');num.style.cssText='background:rgba(244,129,32,.15);color:var(--cf);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:Space Mono,monospace;flex-shrink:0';
+      num.textContent=String(r.i+1);
+      const info=document.createElement('div');
+      const ttl=document.createElement('div');ttl.style.cssText='font-size:13px;font-weight:600;color:var(--text)';ttl.textContent=t.slides[r.i].title;
+      const ch=document.createElement('div');ch.style.cssText='font-size:11px;color:var(--dim)';ch.textContent=t.slides[r.i].chapter;
+      info.appendChild(ttl);info.appendChild(ch);
+      const arr=document.createElement('i');arr.className='fa fa-arrow-right';arr.style.cssText='margin-left:auto;color:var(--dim);font-size:11px';
+      el.appendChild(num);el.appendChild(info);el.appendChild(arr);
+      el.onmouseover=()=>{el.style.borderColor='var(--cf)';el.style.background='var(--card)';};
+      el.onmouseout=()=>{el.style.borderColor='var(--border)';el.style.background='var(--surface)';};
+      el.onclick=()=>{jump(r.i);sOver.style.display='none';sInput.value='';};
+      list.appendChild(el);
+    });
+  }
+  sOver.style.display='block';
+}
+document.addEventListener('click',e=>{if(!sOver.contains(e.target)&&e.target!==sInput)sOver.style.display='none';});
+
+/* ── Toast ── */
+function showToast(icon,msg,color){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=`<span style="color:${color||'var(--cf)'};font-size:16px;flex-shrink:0">${icon}</span><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(()=>{t.classList.add('hiding');setTimeout(()=>t.remove(),300);},3000);
+}
+
+/* ── TOC ── */
+function openTOC(){
+  const modal=document.getElementById('toc-modal'),body=document.getElementById('toc-body'),t=T[lang];
+  body.innerHTML='';
+  t.chapterGroups.forEach(grp=>{
+    const ch=document.createElement('div');ch.className='toc-chapter';ch.textContent=grp.label;body.appendChild(ch);
+    grp.slides.forEach(i=>{
+      const el=document.createElement('div');el.className='toc-item'+(i===cur?' cur':'');
+      const ck=document.createElement('div');ck.className='toc-check'+(completed.has(i)?' done':'');
+      ck.textContent=completed.has(i)?'✓':'';
+      const lb=document.createElement('span');lb.textContent=t.slides[i].title;
+      el.appendChild(ck);el.appendChild(lb);
+      el.onclick=()=>{jump(i);modal.classList.remove('open');};
+      body.appendChild(el);
+    });
+  });
+  modal.classList.add('open');
+}
+function closeTOC(){document.getElementById('toc-modal').classList.remove('open');}
+
+/* ── Bookmark ── */
+function toggleBookmark(){
+  if(bookmarks.has(cur)){bookmarks.delete(cur);showToast('🔖',lang==='th'?'ลบ bookmark แล้ว':'Bookmark removed','var(--muted)');}
+  else{bookmarks.add(cur);showToast('🔖',lang==='th'?'บันทึก bookmark แล้ว':'Bookmark saved','var(--cf)');}
+  const fbm=document.getElementById('fab-bm');if(fbm)fbm.className='fab-btn'+(bookmarks.has(cur)?' bookmarked':'');
+  renderSidebar();saveState();
+}
+
+/* ── Notes ── */
+function toggleNotes(){
+  const p=document.getElementById('notes-panel');p.classList.toggle('open');
+  if(p.classList.contains('open')){const ta=document.getElementById('notes-textarea');if(ta){ta.value=notes[cur]||'';setTimeout(()=>ta.focus(),50);}}
+}
+function saveNote(){
+  const ta=document.getElementById('notes-textarea');
+  if(ta){notes[cur]=ta.value.slice(0,5000);saveState();renderSidebar();}
+  const fn=document.getElementById('fab-note');if(fn)fn.className='fab-btn'+(notes[cur]&&notes[cur].trim()?' active-note':'');
+}
+function clearNote(){notes[cur]='';const ta=document.getElementById('notes-textarea');if(ta)ta.value='';saveNote();}
+function exportNotes(){
+  let out='Cloudflare Zero Trust — Course Notes\n'+'='.repeat(40)+'\n\n';
+  let any=false;
+  Object.entries(notes).forEach(([k,v])=>{
+    if(v&&v.trim()){any=true;const i=parseInt(k);out+=`## ${T[lang].slides[i]?T[lang].slides[i].title:'Slide '+(i+1)}\n${v.trim()}\n\n`;}
+  });
+  if(!any){showToast('📝',lang==='th'?'ยังไม่มีบันทึก':'No notes yet','var(--muted)');return;}
+  const blob=new Blob([out],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zt-notes.txt';a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('📥',lang==='th'?'Export สำเร็จ':'Notes exported','var(--ok)');
+}
+
+/* ── Chapter group collapse ── */
+function toggleChapterGroup(gi){
+  const headers=document.querySelectorAll('.ch-group-header');
+  const groups=document.querySelectorAll('.ch-group-items');
+  if(!headers[gi]||!groups[gi])return;
+  if(collapsedGroups.has(gi)){collapsedGroups.delete(gi);headers[gi].classList.remove('collapsed');groups[gi].style.maxHeight='500px';}
+  else{collapsedGroups.add(gi);headers[gi].classList.add('collapsed');groups[gi].style.maxHeight='0';}
+  saveState();
+}
+
+/* ── Resume banner ── */
+function showResumeBanner(){
+  if(window._resumeCur&&window._resumeCur>0){
+    const t=T[lang];
+    const banner=document.getElementById('resume-banner');
+    safeText(document.getElementById('resume-text'),t.resumeText+(window._resumeCur+1));
+    safeText(document.getElementById('resume-yes'),t.resumeYes);
+    if(banner)banner.classList.add('show');
+  }
+}
+function resumeSession(){jump(window._resumeCur||0);dismissResume();}
+function dismissResume(){const b=document.getElementById('resume-banner');if(b)b.classList.remove('show');window._resumeCur=null;}
+
+/* ── Mobile sidebar ── */
+document.getElementById('menu-toggle').onclick=()=>{
+  document.querySelector('.sidebar-container').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+};
+function closeSidebar(){
+  document.querySelector('.sidebar-container').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+/* ── Touch swipe ── */
+let _tx=0,_ty=0;
+document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX;_ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-_tx,dy=e.changedTouches[0].clientY-_ty;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){
+    if(!e.target.closest('input,textarea,.code-block,.modal-box'))dx<0?go(1):go(-1);
+  }
+},{passive:true});
+
+/* ── Scroll to top ── */
+window.addEventListener('scroll',()=>{const st=document.getElementById('scroll-top');if(st)st.classList.toggle('visible',window.scrollY>200);},{passive:true});
+
+/* ── Keyboard shortcuts ── */
+document.addEventListener('keydown',e=>{
+  const tag=e.target.tagName.toLowerCase();
+  if(tag==='input'||tag==='textarea')return;
+  const mo=document.querySelector('.modal-backdrop.open');
+  if(e.key==='Escape'){if(mo)mo.classList.remove('open');sOver.style.display='none';document.getElementById('notes-panel').classList.remove('open');return;}
+  if(mo)return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();go(1);}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(-1);}
+  if(e.key==='t'||e.key==='T')openTOC();
+  if(e.key==='b'||e.key==='B')toggleBookmark();
+  if(e.key==='n'||e.key==='N')toggleNotes();
+  if(e.key==='s'||e.key==='S'){e.preventDefault();sInput.focus();}
+  if(e.key==='p'||e.key==='P')window.print();
+  if(e.key==='?')document.getElementById('kb-modal').classList.add('open');
+});
+
+/* ── Confetti ── */
+function triggerConfetti(){
+  const canvas=document.getElementById('confetti-canvas');if(!canvas)return;
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const cols=['#F48120','#38BDF8','#4ADE80','#F87171','#FBA94C','#fff'];
+  const ps=Array.from({length:150},()=>({
+    x:Math.random()*canvas.width,y:-20,r:Math.random()*6+2,
+    c:cols[Math.floor(Math.random()*cols.length)],
+    dx:(Math.random()-.5)*4,dy:Math.random()*3+2,
+    rot:Math.random()*360,dr:Math.random()*6-3,op:1
+  }));
+  let f=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ps.forEach(p=>{
+      p.x+=p.dx;p.y+=p.dy;p.rot+=p.dr;
+      if(f>80)p.op-=0.018;
+      ctx.save();ctx.globalAlpha=Math.max(0,p.op);
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      ctx.restore();
+    });
+    f++;if(f<140)requestAnimationFrame(draw);else canvas.style.display='none';
+  }
+  requestAnimationFrame(draw);
+  showToast('🎉',lang==='th'?'ยินดีด้วย! เรียนจบแล้ว!':'Congratulations! Course complete!','var(--ok)');
+}
+
+/* ── Certificate ── */
+function openCertModal(){document.getElementById('cert-modal').classList.add('open');document.getElementById('cert-dl-btn').style.display='none';}
+function generateCert(){
+  const name=document.getElementById('cert-name').value.trim()||'Student';
+  const canvas=document.getElementById('cert-canvas');
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,560,380);
+  ctx.fillStyle='#0B0F19';ctx.fillRect(0,0,560,380);
+  ctx.strokeStyle='#F48120';ctx.lineWidth=2;ctx.strokeRect(12,12,536,356);
+  ctx.strokeStyle='rgba(244,129,32,.3)';ctx.lineWidth=.5;ctx.strokeRect(18,18,524,344);
+  const g=ctx.createLinearGradient(0,0,560,0);g.addColorStop(0,'#C86A10');g.addColorStop(.5,'#F48120');g.addColorStop(1,'#FBA94C');
+  ctx.fillStyle=g;ctx.fillRect(12,12,536,4);
+  ctx.fillStyle='rgba(244,129,32,.1)';ctx.beginPath();ctx.arc(280,70,32,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#F48120';ctx.font='bold 28px serif';ctx.textAlign='center';ctx.fillText('🛡',280,80);
+  ctx.fillStyle='#F48120';ctx.font='bold 12px sans-serif';ctx.letterSpacing='2px';ctx.fillText('CERTIFICATE OF COMPLETION',280,120);
+  ctx.fillStyle='#E2E8F0';ctx.font='bold 18px sans-serif';ctx.fillText('Cloudflare Zero Trust',280,158);
+  ctx.fillStyle='#94A3B8';ctx.font='12px sans-serif';ctx.fillText('Complete Course',280,178);
+  ctx.strokeStyle='rgba(244,129,32,.4)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(100,196);ctx.lineTo(460,196);ctx.stroke();
+  ctx.fillStyle='#94A3B8';ctx.font='11px sans-serif';ctx.fillText('This certifies that',280,220);
+  ctx.fillStyle='#F8A24A';ctx.font='bold 24px sans-serif';ctx.fillText(name,280,252);
+  ctx.fillStyle='#94A3B8';ctx.font='11px sans-serif';ctx.fillText('has successfully completed the Cloudflare Zero Trust course',280,274);
+  const correct=Object.values(quizSession.answered||{}).filter(Boolean).length;
+  const total=quizSession.questions.length||5;
+  const pct=total>0?Math.round(correct/total*100):0;
+  ctx.fillStyle='rgba(74,222,128,.2)';ctx.beginPath();ctx.roundRect?ctx.roundRect(196,290,76,26,6):ctx.rect(196,290,76,26);ctx.fill();
+  ctx.fillStyle='#4ADE80';ctx.font='bold 11px monospace';ctx.fillText(`Quiz: ${correct}/${total}`,234,307);
+  const d=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  ctx.fillStyle='rgba(244,129,32,.2)';ctx.beginPath();ctx.roundRect?ctx.roundRect(292,290,74,26,6):ctx.rect(292,290,74,26);ctx.fill();
+  ctx.fillStyle='#FBA94C';ctx.font='bold 9px sans-serif';ctx.fillText(d,329,307);
+  ctx.fillStyle='#334155';ctx.font='10px monospace';ctx.fillText('Powered by IBIGKUNG | 2026',280,352);
+  document.getElementById('cert-dl-btn').style.display='inline-flex';
+}
+function downloadCert(){
+  const name=(document.getElementById('cert-name').value.trim().replace(/[^a-zA-Z0-9_-]/g,'_')||'cert');
+  const canvas=document.getElementById('cert-canvas');
+  const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=`zt_certificate_${name}.png`;a.click();
+}
+
+/* ── Timer ── */
+timerInterval=setInterval(()=>{renderStats();saveState();},60000);
+
+/* ── INIT ── */
+loadState();
+document.documentElement.style.setProperty('--fs',fontSize+'px');
+if(lightMode){document.getElementById('body-el').classList.add('light-mode');document.getElementById('theme-icon').className='fa fa-moon';}
+if(!quizSession.questions||quizSession.questions.length!==5)newQuizSession();
+setLang(lang);
+render();
+setTimeout(showResumeBanner,800);
+</script>
+</body>
+</html>
